@@ -17,7 +17,6 @@ import { SpecCateService } from './spec-category.service';
 @ApiTags('spec-category')
 @Controller('spec-category')
 export class SpecCateController {
-  serviceName = 'SpecCategoryController';
   constructor(private readonly specCateSerivce: SpecCateService) {}
 
   @Get()
@@ -26,7 +25,7 @@ export class SpecCateController {
       const cates = await this.specCateSerivce.getAll();
       return cates;
     } catch (err) {
-      throw new HttpBadRequestException(this.serviceName, err);
+      throw new HttpBadRequestException(SpecCateController.name, err);
     }
   }
 
@@ -37,7 +36,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.getOne(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(this.serviceName, err);
+      throw new HttpBadRequestException(SpecCateController.name, err);
     }
   }
 
@@ -47,7 +46,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.create(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(this.serviceName, err);
+      throw new HttpBadRequestException(SpecCateController.name, err);
     }
   }
 
@@ -57,7 +56,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.update(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(this.serviceName, err);
+      throw new HttpBadRequestException(SpecCateController.name, err);
     }
   }
 
@@ -68,7 +67,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.remove(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(this.serviceName, err);
+      throw new HttpBadRequestException(SpecCateController.name, err);
     }
   }
 }
