@@ -21,6 +21,12 @@ class SpecCategoryEntity {
   @Property({ nullable: false, default: false })
   isAdvanced!: boolean;
 
+  @Property({ nullable: false, default: false })
+  hidden!: boolean;
+
+  @Property({ nullable: false, default: false })
+  isFilter!: boolean;
+
   @Property({
     columnType: 'timestamp',
     defaultRaw: `current_timestamp`,

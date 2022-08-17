@@ -9,9 +9,10 @@ import {
   IsString,
 } from 'class-validator';
 import ProductEntity from 'src/entities/product.entity';
-import SpecificationEntity from 'src/entities/specification.entity';
+import SpecValueEntity from 'src/entities/spec-value.entity';
+import { SpecCategoryDTO } from 'src/modules/spec-category/dto/spec-category.dto';
 
-export class SpecCategoryDTO {
+export class SpecDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
@@ -40,13 +41,16 @@ export class SpecCategoryDTO {
   @IsOptional()
   updatedAt?: Date;
 
+  @Type(() => SpecCategoryDTO)
+  cate: SpecCategoryDTO;
+
   @IsArray()
-  @Type(() => SpecificationEntity)
-  specs: SpecificationEntity[];
+  @Type(() => SpecValueEntity)
+  specValues: SpecValueEntity[];
 
   @IsArray()
   @Type(() => ProductEntity)
   products: ProductEntity[];
 }
 
-export class GetOneSpecCategoryDTO extends PickType(SpecCategoryDTO, ['id']) {}
+export class GetOneSpecDTO extends PickType(SpecDTO, ['id']) {}

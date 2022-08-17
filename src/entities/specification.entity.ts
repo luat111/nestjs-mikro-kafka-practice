@@ -20,6 +20,9 @@ class SpecificationEntity {
   @Property({ nullable: false })
   name!: string;
 
+  @Property({ nullable: false, default: false })
+  isFilter!: boolean;
+
   @Property({
     columnType: 'timestamp',
     defaultRaw: `current_timestamp`,
