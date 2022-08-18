@@ -9,7 +9,7 @@ import {
   IsString,
 } from 'class-validator';
 import ProductEntity from 'src/entities/product.entity';
-import SpecificationEntity from 'src/entities/specification.entity';
+import { SpecDTO } from 'src/modules/specification/dto/spec.dto';
 
 export class SpecCategoryDTO {
   @ApiProperty()
@@ -31,6 +31,10 @@ export class SpecCategoryDTO {
   hidden: boolean;
 
   @ApiProperty()
+  @IsBoolean()
+  isFilter: boolean;
+
+  @ApiProperty()
   @IsDate()
   @IsOptional()
   createdAt?: Date;
@@ -41,8 +45,8 @@ export class SpecCategoryDTO {
   updatedAt?: Date;
 
   @IsArray()
-  @Type(() => SpecificationEntity)
-  specs: SpecificationEntity[];
+  @Type(() => SpecDTO)
+  specs: SpecDTO[];
 
   @IsArray()
   @Type(() => ProductEntity)

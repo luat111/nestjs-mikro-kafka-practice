@@ -1,13 +1,19 @@
 import { EntityRepository, wrap } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Inject, Injectable } from '@nestjs/common';
-import SpecCategoryEntity from 'src/entities/spec-category.entity';
+
 import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import SpecCategoryEntity from 'src/entities/spec-category.entity';
+import NotFoundRecordException from '../../core/exceptions/not-found.exception';
+
+import { LoggerService } from '../logger/logger.service';
+
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
-import NotFoundRecordException from '../../core/exceptions/not-found.exception';
-import { ISpecCategorySerivce } from './interface/spec-category.interface';
-import { LoggerService } from '../logger/logger.service';
+import {
+  ISpecCategorySerivce,
+  ISpecCateogry,
+} from './interface/spec-category.interface';
 
 @Injectable()
 export class SpecCateService implements ISpecCategorySerivce {
@@ -20,9 +26,10 @@ export class SpecCateService implements ISpecCategorySerivce {
     this.logger.setContext(SpecCateService.name);
   }
 
-  async getAll() {
+  async getAll(): Promise<ISpecCateogry[]> {
     try {
       const cates = await this.specCateRepo.findAll();
+      throw new HttpBadRequestException(SpecCateService.name, 'asbc');
       return cates;
     } catch (err) {
       this.logger.error(err.response.message || err.message);
@@ -30,7 +37,7 @@ export class SpecCateService implements ISpecCategorySerivce {
     }
   }
 
-  async getOne(id: string) {
+  async getOne(id: string): Promise<ISpecCateogry> {
     try {
       const cate = await this.specCateRepo.findOne(
         {
@@ -50,18 +57,18 @@ export class SpecCateService implements ISpecCategorySerivce {
     }
   }
 
-  async create(payload: CreateSpecCategoryDTO) {
+  async create(payload: CreateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const cate = this.specCateRepo.create(payload);
-      const newCate = await this.specCateRepo.persistAndFlush(cate);
-      return newCate;
+      await this.specCateRepo.persistAndFlush(cate);
+      return cate;
     } catch (err) {
       this.logger.error(err);
       throw new HttpBadRequestException(SpecCateService.name, err);
     }
   }
 
-  async update(payload: UpdateSpecCategoryDTO) {
+  async update(payload: UpdateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const { id, ...rest } = payload;
       const cate = await this.getOne(id);
@@ -70,18 +77,19 @@ export class SpecCateService implements ISpecCategorySerivce {
         ...rest,
       });
 
-      const newCate = await this.specCateRepo.persistAndFlush(cate);
-      return newCate;
+      await this.specCateRepo.persistAndFlush(cate);
+      return cate;
     } catch (err) {
       this.logger.error(err);
       throw new HttpBadRequestException(SpecCateService.name, err);
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<string> {
     try {
       const cate = await this.getOne(id);
-      return await this.specCateRepo.removeAndFlush(cate);
+      await this.specCateRepo.removeAndFlush(cate);
+      return 'Delete successed';
     } catch (err) {
       this.logger.error(err);
       throw new HttpBadRequestException(SpecCateService.name, err);

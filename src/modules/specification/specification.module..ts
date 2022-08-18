@@ -9,7 +9,7 @@ import { SpecificationService } from './specification.service';
   imports: [
     MikroOrmModule.forFeature([SpecificationEntity], 'dbStaging'),
     MikroOrmModule.forFeature([SpecificationEntity], 'dbLocal'),
-    LoggerModule
+    LoggerModule,
   ],
   controllers: [SpecificationController],
   providers: [SpecificationService],

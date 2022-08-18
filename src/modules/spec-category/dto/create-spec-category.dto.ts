@@ -5,4 +5,6 @@ export class CreateSpecCategoryDTO extends OmitType(SpecCategoryDTO, [
   'id',
   'specs',
   'products',
+  'createdAt',
+  'updatedAt',
 ]) {}

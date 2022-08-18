@@ -12,6 +12,7 @@ import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetOneSpecCategoryDTO } from './dto/spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
+import { ISpecCateogry } from './interface/spec-category.interface';
 import { SpecCateService } from './spec-category.service';
 
 @ApiTags('spec-category')
@@ -20,7 +21,7 @@ export class SpecCateController {
   constructor(private readonly specCateSerivce: SpecCateService) {}
 
   @Get()
-  async getAll() {
+  async getAll(): Promise<ISpecCateogry[]> {
     try {
       const cates = await this.specCateSerivce.getAll();
       return cates;
@@ -30,7 +31,7 @@ export class SpecCateController {
   }
 
   @Get(':id')
-  async getOne(@Param() params: GetOneSpecCategoryDTO) {
+  async getOne(@Param() params: GetOneSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const { id } = params;
       const cate = await this.specCateSerivce.getOne(id);
@@ -41,7 +42,7 @@ export class SpecCateController {
   }
 
   @Post()
-  async create(@Body() body: CreateSpecCategoryDTO) {
+  async create(@Body() body: CreateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const cate = await this.specCateSerivce.create(body);
       return cate;
@@ -51,7 +52,7 @@ export class SpecCateController {
   }
 
   @Put()
-  async update(@Body() body: UpdateSpecCategoryDTO) {
+  async update(@Body() body: UpdateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const cate = await this.specCateSerivce.update(body);
       return cate;
@@ -61,7 +62,7 @@ export class SpecCateController {
   }
 
   @Delete(':id')
-  async remove(@Param() params: GetOneSpecCategoryDTO) {
+  async remove(@Param() params: GetOneSpecCategoryDTO): Promise<string> {
     try {
       const { id } = params;
       const cate = await this.specCateSerivce.remove(id);

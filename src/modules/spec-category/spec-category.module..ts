@@ -9,7 +9,7 @@ import { SpecCateService } from './spec-category.service';
   imports: [
     MikroOrmModule.forFeature([SpecCategoryEntity], 'dbStaging'),
     MikroOrmModule.forFeature([SpecCategoryEntity], 'dbLocal'),
-    LoggerModule
+    LoggerModule,
   ],
   controllers: [SpecCateController],
   providers: [SpecCateService],
