@@ -6,10 +6,9 @@ import { AppService } from './app.service';
 import configurations from './config/configurations';
 
 import { DatabaseModule } from './modules/database/database.module';
-import { ProductModule } from './modules/product/product.module.';
-import { SpecCateModule } from './modules/spec-category/spec-category.module.';
-import { SpecValueModule } from './modules/spec-value/spec-value.module.';
-import { SpecificationModule } from './modules/specification/specification.module.';
+import { ProductModule } from './modules/product/product.module';
+import { SpecificationCategoryModule } from './modules/spec-category/spec-category.module';
+import { SpecificationModule } from './modules/spec/specification.module';
 
 @Module({
   imports: [
@@ -20,8 +19,7 @@ import { SpecificationModule } from './modules/specification/specification.modul
     DatabaseModule,
     ProductModule,
     SpecificationModule,
-    SpecCateModule,
-    SpecValueModule,
+    SpecificationCategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
