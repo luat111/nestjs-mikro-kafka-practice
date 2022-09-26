@@ -1,4 +1,5 @@
 import {
+  Cascade,
   Collection,
   Entity,
   Filter,
@@ -6,9 +7,9 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import SpecificationEntity from './spec.entity';
-import CategorySpecificationEntity from './spec_category.entity';
-import SpecificationValueEntity from './spec_value.entity';
+import SpecCategoryEntity from './spec-category.entity';
+import SpecValueEntity from './spec-value.entity';
+import SpecificationEntity from './specification.entity';
 
 @Entity({ tableName: 'Products' })
 @Filter({
@@ -25,18 +26,21 @@ class ProductEntity {
   @Property()
   publish: boolean;
 
-  @ManyToMany(() => SpecificationValueEntity, (values) => values.products, {
+  @ManyToMany(() => SpecValueEntity, (values) => values.products, {
     owner: true,
+    cascade: [Cascade.ALL],
   })
-  specValues: Collection<SpecificationValueEntity>;
+  specValues: Collection<SpecValueEntity>;
   @ManyToMany(() => SpecificationEntity, (specs) => specs.products, {
     owner: true,
+    cascade: [Cascade.ALL],
   })
   specs: Collection<SpecificationEntity>;
-  @ManyToMany(() => CategorySpecificationEntity, (cates) => cates.products, {
+  @ManyToMany(() => SpecCategoryEntity, (cates) => cates.products, {
     owner: true,
+    cascade: [Cascade.ALL],
   })
-  specCates: Collection<CategorySpecificationEntity>;
+  specCates: Collection<SpecCategoryEntity>;
 }
 
 export default ProductEntity;

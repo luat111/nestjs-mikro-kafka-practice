@@ -40,8 +40,9 @@ class SpecValueEntity {
     cascade: [Cascade.ALL],
     onUpdateIntegrity: 'set null',
     onDelete: 'cascade',
+    nullable: false,
   })
-  specificaiton: SpecificationEntity;
+  specification: SpecificationEntity;
 
   @ManyToMany(() => ProductEntity, (products) => products.specValues, {
     cascade: [Cascade.ALL],

@@ -42,10 +42,11 @@ class SpecificationEntity {
     cascade: [Cascade.ALL],
     onDelete: 'cascade',
     onUpdateIntegrity: 'set null',
+    nullable: false,
   })
   cate: SpecCategoryEntity;
 
-  @OneToMany(() => SpecValueEntity, (specValue) => specValue.specificaiton, {
+  @OneToMany(() => SpecValueEntity, (specValue) => specValue.specification, {
     cascade: [Cascade.ALL],
   })
   specValues: Collection<SpecValueEntity>;

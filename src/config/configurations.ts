@@ -13,5 +13,10 @@ export default () => ({
     DB_HOST_LOCAL: process.env.DB_HOST_LOCAL || '',
     DB_PORT_LOCAL: process.env.DB_PORT_LOCAL || '',
   },
+  kafka: {
+    clientId: process.env.CLIENT_ID || 'spec',
+    broker: process.env.BROKER || 'localhost:9092',
+    groupId: process.env.GROUP_ID || 'spec-kafka'
+  },
   port: process.env.PORT || 3000,
 });
