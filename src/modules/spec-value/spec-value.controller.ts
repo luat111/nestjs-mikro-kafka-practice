@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -12,13 +13,18 @@ import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
 import { GetOneSpecValueDTO } from './dto/spec-value.dto';
 import { UpdateSpecValueDTO } from './dto/update-spec-value.dto';
-import { ISpecValue } from './interface/spec-value.interface';
-import { SpecValueService } from './spec-value.service';
+import {
+  ISpecValue,
+  ISpecValueService,
+} from './interface/spec-value.interface';
 
 @ApiTags('spec-value')
 @Controller('spec-value')
 export class SpecValueController {
-  constructor(private readonly specValueSerivce: SpecValueService) {}
+  constructor(
+    @Inject('ISpecValueService')
+    private readonly specValueSerivce: ISpecValueService,
+  ) {}
 
   @Get()
   async getAll(): Promise<ISpecValue[]> {

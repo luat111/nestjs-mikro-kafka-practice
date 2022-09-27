@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { IsArray, IsDateString, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsDateString, IsOptional } from 'class-validator';
 import { SpecCategoryDTO } from './spec-category.dto';
 
 export class GetSpecCategoryDTO extends OmitType(SpecCategoryDTO, [

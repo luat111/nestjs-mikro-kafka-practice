@@ -2,16 +2,19 @@ import {
   EntityRepository,
   MikroORM,
   UseRequestContext,
-  wrap
+  wrap,
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import SpecificationEntity from 'src/entities/specification.entity';
 
 import { LoggerService } from '../logger/logger.service';
+import { IProductSerivce } from '../product/interface/product.interface';
+import { ISpecCategorySerivce } from '../spec-category/interface/spec-category.interface';
+import { ISpecValueService } from '../spec-value/interface/spec-value.interface';
 
 import { CreateSpecDTO } from './dto/create-spec.dto';
 import { UpdateSpecDTO } from './dto/update-spec.dto';
@@ -26,13 +29,19 @@ export class SpecificationService {
     private readonly orm: MikroORM,
     @InjectRepository(SpecificationEntity, 'dbLocal')
     private readonly specRepo: EntityRepository<SpecificationEntity>,
+    @Inject(forwardRef(() => 'ISpecCategorySerivce'))
+    private readonly specCateService: ISpecCategorySerivce,
+    @Inject(forwardRef(() => 'ISpecValueService'))
+    private readonly specValueService: ISpecValueService,
+    @Inject('IProductService')
+    private readonly productService: IProductSerivce,
   ) {
     this.logger.setContext(SpecificationService.name);
   }
 
   @UseRequestContext()
   async commit(payload: ISpecification | ISpecification[]): Promise<void> {
-    await this.specRepo.persistAndFlush(payload);
+    await this.commit(payload);
   }
 
   async getAll(): Promise<ISpecification[]> {
@@ -40,7 +49,7 @@ export class SpecificationService {
       const specs = await this.specRepo.findAll();
       return specs;
     } catch (err) {
-      this.logger.error(err.response.message || err.message);
+      this.logger.error(err);
       throw new BadRequest(SpecificationService.name, err);
     } finally {
       this.orm.em.clear();
@@ -71,8 +80,10 @@ export class SpecificationService {
 
   async create(payload: CreateSpecDTO): Promise<ISpecification> {
     try {
+      const { cate } = payload;
+      await this.specCateService.getOne(cate);
       const spec = this.specRepo.create(payload);
-      await this.specRepo.persistAndFlush(spec);
+      await this.commit(spec);
       return spec;
     } catch (err) {
       this.logger.error(err);
@@ -82,15 +93,29 @@ export class SpecificationService {
 
   async update(payload: UpdateSpecDTO): Promise<ISpecification> {
     try {
-      const { id, ...rest } = payload;
+      const { id, cate, products, specValues, ...rest } = payload;
       const spec = await this.getOne(id);
 
-      wrap(spec).assign({
+      cate && this.specCateService.getOne(cate);
+
+      specValues.length &&
+        (await Promise.all(
+          specValues.map(
+            async (valueId) => await this.specValueService.getOne(valueId),
+          ),
+        ));
+
+      products.length &&
+        (await Promise.all(
+          products.map(async (pId) => await this.productService.getOne(pId)),
+        ));
+
+      const updatedSpec = wrap(spec).assign({
         ...rest,
       });
 
-      await this.specRepo.persistAndFlush(spec);
-      return spec;
+      await this.commit(updatedSpec);
+      return updatedSpec;
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecificationService.name, err);

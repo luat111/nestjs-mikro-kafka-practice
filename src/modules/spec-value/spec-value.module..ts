@@ -1,5 +1,5 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import SpecValueEntity from 'src/entities/spec-value.entity';
 import { LoggerModule } from '../logger/logger.module';
 import { ProductModule } from '../product/product.module.';
@@ -12,11 +12,16 @@ import { SpecValueService } from './spec-value.service';
     MikroOrmModule.forFeature([SpecValueEntity], 'dbStaging'),
     MikroOrmModule.forFeature([SpecValueEntity], 'dbLocal'),
     LoggerModule,
-    SpecificationModule,
-    ProductModule
+    forwardRef(() => SpecificationModule),
+    forwardRef(() => ProductModule),
   ],
   controllers: [SpecValueController],
-  providers: [SpecValueService],
-  exports: [SpecValueService],
+  providers: [
+    {
+      provide: 'ISpecValueService',
+      useClass: SpecValueService,
+    },
+  ],
+  exports: ['ISpecValueService'],
 })
 export class SpecValueModule {}

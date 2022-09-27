@@ -16,7 +16,8 @@ export default () => ({
   kafka: {
     clientId: process.env.CLIENT_ID || 'spec',
     broker: process.env.BROKER || 'localhost:9092',
-    groupId: process.env.GROUP_ID || 'spec-kafka'
+    groupId: process.env.GROUP_ID || 'spec-kafka',
+    topic: process.env.TOPIC || 'spec-topic',
   },
   port: process.env.PORT || 3000,
 });

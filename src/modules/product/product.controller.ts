@@ -2,23 +2,25 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Put,
   Query,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { GetProductDTO } from './dto/get-product.dto';
 import { GetOneProductDTO } from './dto/product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
-import { ProductService } from './product.service';
+import { IProductSerivce } from './interface/product.interface';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productSerivce: ProductService) {}
+  constructor(
+    @Inject('IProductService')
+    private readonly productSerivce: IProductSerivce,
+  ) {}
 
   @Get('sync')
   async sync() {
@@ -30,9 +32,7 @@ export class ProductController {
   }
 
   @Get()
-  async getAll(
-    @Query() query: GetProductDTO,
-  ) {
+  async getAll(@Query() query: GetProductDTO) {
     try {
       return await this.productSerivce.getAll(query);
     } catch (err) {

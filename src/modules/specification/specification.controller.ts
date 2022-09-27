@@ -6,7 +6,7 @@ import {
   Inject,
   Param,
   Post,
-  Put
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';

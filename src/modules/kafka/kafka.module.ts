@@ -3,7 +3,7 @@ import { LoggerModule } from '../logger/logger.module';
 import { KafkaService } from './kafka.service';
 
 @Module({
-  imports:[LoggerModule],
+  imports: [LoggerModule],
   providers: [KafkaService],
   exports: [KafkaService],
 })

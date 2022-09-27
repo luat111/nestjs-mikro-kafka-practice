@@ -5,23 +5,21 @@ import {
   wrap,
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import SpecValueEntity from 'src/entities/spec-value.entity';
 
 import { LoggerService } from '../logger/logger.service';
-import { ProductService } from '../product/product.service';
+import { IProductSerivce } from '../product/interface/product.interface';
 import { ISpecificationService } from '../specification/interface/specification.interface';
-
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
 import { UpdateSpecValueDTO } from './dto/update-spec-value.dto';
 import {
   ISpecValue,
   ISpecValueService,
 } from './interface/spec-value.interface';
-
 @Injectable()
 export class SpecValueService implements ISpecValueService {
   constructor(
@@ -31,9 +29,10 @@ export class SpecValueService implements ISpecValueService {
     private readonly orm: MikroORM,
     @InjectRepository(SpecValueEntity, 'dbLocal')
     private readonly specValueRepo: EntityRepository<SpecValueEntity>,
-    @Inject('ISpecificationService')
+    @Inject(forwardRef(() => 'ISpecificationService'))
     private readonly specService: ISpecificationService,
-    private readonly productService: ProductService,
+    @Inject('IProductService')
+    private readonly productService: IProductSerivce,
   ) {
     this.logger.setContext(SpecValueService.name);
   }
@@ -106,7 +105,7 @@ export class SpecValueService implements ISpecValueService {
       const updatedSpecValue = wrap(specValue).assign({
         ...rest,
       });
-      
+
       await this.commit(updatedSpecValue);
       return updatedSpecValue;
     } catch (err) {

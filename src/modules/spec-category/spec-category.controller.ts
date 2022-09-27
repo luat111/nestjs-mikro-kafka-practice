@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -12,13 +13,18 @@ import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetOneSpecCategoryDTO } from './dto/spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
-import { ISpecCateogry } from './interface/spec-category.interface';
-import { SpecCateService } from './spec-category.service';
+import {
+  ISpecCategorySerivce,
+  ISpecCateogry,
+} from './interface/spec-category.interface';
 
 @ApiTags('spec-category')
 @Controller('spec-category')
 export class SpecCateController {
-  constructor(private readonly specCateSerivce: SpecCateService) {}
+  constructor(
+    @Inject('ISpecCategorySerivce')
+    private readonly specCateSerivce: ISpecCategorySerivce,
+  ) {}
 
   @Get()
   async getAll(): Promise<ISpecCateogry[]> {

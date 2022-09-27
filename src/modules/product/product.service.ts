@@ -2,6 +2,7 @@ import { MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EachMessagePayload } from 'kafkajs';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
@@ -10,6 +11,7 @@ import ProductEntity from 'src/entities/product.entity';
 
 import { KafkaService } from '../kafka/kafka.service';
 import { LoggerService } from '../logger/logger.service';
+import { CreateProductDTO } from './dto/create-product.dto';
 import { GetProductDTO } from './dto/get-product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
 import { IProduct, IProductSerivce } from './interface/product.interface';
@@ -19,6 +21,7 @@ export class ProductService implements IProductSerivce {
   constructor(
     private readonly kafkaService: KafkaService,
     private readonly logger: LoggerService,
+    private readonly configService: ConfigService,
     @InjectMikroORM('dbLocal')
     private readonly orm: MikroORM,
     @InjectRepository(ProductEntity, 'dbLocal')
@@ -35,20 +38,25 @@ export class ProductService implements IProductSerivce {
   }
 
   async onModuleInit() {
-    // await this.kafkaService.consume(
-    //   {
-    //     topics: ['test-topic'],
-    //     fromBeginning: true,
-    //   },
-    //   {
-    //     eachMessage: (message: EachMessagePayload) =>
-    //       this.handleMessage(message),
-    //   },
-    // );
+    await this.kafkaService.consume(
+      {
+        topics: [this.configService.get<string>('kafka.topic')],
+        fromBeginning: true,
+      },
+      {
+        eachMessage: (message: EachMessagePayload) =>
+          this.handleMessage(message),
+      },
+    );
   }
 
-  async handleMessage({ topic, partition, message }: EachMessagePayload) {
-    console.log(message.value.toString());
+  async handleMessage({ message }: EachMessagePayload) {
+    try {
+      const payloadProduct = JSON.parse(message.value.toString());
+      await this.create(payloadProduct);
+    } catch (err) {
+      this.logger.error(err);
+    }
   }
 
   async getOne(id: string): Promise<IProduct> {
@@ -116,6 +124,17 @@ export class ProductService implements IProductSerivce {
       throw new BadRequest(ProductService.name, err);
     } finally {
       this.orm.em.clear();
+    }
+  }
+
+  async create(payload: CreateProductDTO): Promise<ProductEntity> {
+    try {
+      const product = this.productRepoLocal.create(payload);
+      await this.commit(product);
+      return product;
+    } catch (err) {
+      this.logger.error(err);
+      throw new BadRequest(ProductService.name, err);
     }
   }
 

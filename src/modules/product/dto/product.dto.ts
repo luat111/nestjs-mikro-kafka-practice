@@ -8,7 +8,7 @@ export class ProductDTO {
   @ApiProperty()
   @IsString()
   id: string;
-  
+
   @ApiProperty()
   @IsBoolean()
   publish: boolean;

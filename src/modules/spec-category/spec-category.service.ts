@@ -1,12 +1,19 @@
-import { EntityRepository, MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
+import {
+  EntityRepository,
+  MikroORM,
+  UseRequestContext,
+  wrap,
+} from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import SpecCategoryEntity from 'src/entities/spec-category.entity';
 import NotFoundRecord from '../../core/exceptions/not-found.exception';
 
 import { LoggerService } from '../logger/logger.service';
+import { IProductSerivce } from '../product/interface/product.interface';
+import { ISpecificationService } from '../specification/interface/specification.interface';
 
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
@@ -24,6 +31,10 @@ export class SpecCateService implements ISpecCategorySerivce {
     private readonly orm: MikroORM,
     @InjectRepository(SpecCategoryEntity, 'dbLocal')
     private readonly specCateRepo: EntityRepository<SpecCategoryEntity>,
+    @Inject('IProductService')
+    private readonly productService: IProductSerivce,
+    @Inject(forwardRef(() => 'ISpecificationService'))
+    private readonly specService: ISpecificationService,
   ) {
     this.logger.setContext(SpecCateService.name);
   }
@@ -38,7 +49,7 @@ export class SpecCateService implements ISpecCategorySerivce {
       const cates = await this.specCateRepo.findAll();
       return cates;
     } catch (err) {
-      this.logger.error(err.response.message || err.message);
+      this.logger.error(err);
       throw new BadRequest(SpecCateService.name, err);
     } finally {
       this.orm.em.clear();
@@ -80,8 +91,18 @@ export class SpecCateService implements ISpecCategorySerivce {
 
   async update(payload: UpdateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
-      const { id, ...rest } = payload;
+      const { id, specs, products, ...rest } = payload;
       const cate = await this.getOne(id);
+
+      specs &&
+        (await Promise.all(
+          specs.map(async (specId) => await this.specService.getOne(specId)),
+        ));
+
+      products.length &&
+        (await Promise.all(
+          products.map(async (pId) => await this.productService.getOne(pId)),
+        ));
 
       const updatedCate = wrap(cate).assign({
         ...rest,

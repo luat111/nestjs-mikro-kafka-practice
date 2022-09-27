@@ -52,6 +52,7 @@ export class KafkaService {
     config: ConsumerRunConfig,
   ): Promise<void> {
     try {
+      if (!this.kafka) this.kafka = this.createInstance();
       const consumer = this.kafka.consumer({
         groupId: this.config.get<string>('kafka.groupId'),
       });

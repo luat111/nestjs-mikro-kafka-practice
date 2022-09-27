@@ -1,7 +1,9 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import SpecCategoryEntity from 'src/entities/spec-category.entity';
 import { LoggerModule } from '../logger/logger.module';
+import { ProductModule } from '../product/product.module.';
+import { SpecificationModule } from '../specification/specification.module.';
 import { SpecCateController } from './spec-category.controller';
 import { SpecCateService } from './spec-category.service';
 
@@ -10,9 +12,16 @@ import { SpecCateService } from './spec-category.service';
     MikroOrmModule.forFeature([SpecCategoryEntity], 'dbStaging'),
     MikroOrmModule.forFeature([SpecCategoryEntity], 'dbLocal'),
     LoggerModule,
+    forwardRef(() => SpecificationModule),
+    forwardRef(() => ProductModule),
   ],
   controllers: [SpecCateController],
-  providers: [SpecCateService],
-  exports: [SpecCateService],
+  providers: [
+    {
+      provide: 'ISpecCategorySerivce',
+      useClass: SpecCateService,
+    },
+  ],
+  exports: ['ISpecCategorySerivce'],
 })
 export class SpecCateModule {}
