@@ -4,7 +4,8 @@ import { EntityRepository } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { EachMessagePayload } from 'kafkajs';
 
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
+import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import ProductEntity from 'src/entities/product.entity';
 
 import { KafkaService } from '../kafka/kafka.service';
@@ -75,10 +76,13 @@ export class ProductService implements IProductSerivce {
           },
         },
       );
+
+      if (!product) throw new NotFoundRecord(id);
+
       return product;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(ProductService.name, err);
+      throw new BadRequest(ProductService.name, err);
     } finally {
       this.orm.em.clear();
     }
@@ -90,7 +94,7 @@ export class ProductService implements IProductSerivce {
       return products;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(ProductService.name, err);
+      throw new BadRequest(ProductService.name, err);
     } finally {
       this.orm.em.clear();
     }
@@ -109,7 +113,7 @@ export class ProductService implements IProductSerivce {
       return products;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(ProductService.name, err);
+      throw new BadRequest(ProductService.name, err);
     } finally {
       this.orm.em.clear();
     }
@@ -129,7 +133,7 @@ export class ProductService implements IProductSerivce {
       return updatedProduct;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(ProductService.name, err);
+      throw new BadRequest(ProductService.name, err);
     }
   }
 
@@ -160,7 +164,7 @@ export class ProductService implements IProductSerivce {
       return newProduct;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(ProductService.name, err);
+      throw new BadRequest(ProductService.name, err);
     }
   }
 }

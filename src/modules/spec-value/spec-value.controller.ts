@@ -8,7 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
 import { GetOneSpecValueDTO } from './dto/spec-value.dto';
 import { UpdateSpecValueDTO } from './dto/update-spec-value.dto';
@@ -26,7 +26,7 @@ export class SpecValueController {
       const cates = await this.specValueSerivce.getAll();
       return cates;
     } catch (err) {
-      throw new HttpBadRequestException(SpecValueController.name, err);
+      throw new BadRequest(SpecValueController.name, err);
     }
   }
 
@@ -37,7 +37,7 @@ export class SpecValueController {
       const cate = await this.specValueSerivce.getOne(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecValueController.name, err);
+      throw new BadRequest(SpecValueController.name, err);
     }
   }
 
@@ -47,7 +47,7 @@ export class SpecValueController {
       const cate = await this.specValueSerivce.create(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecValueController.name, err);
+      throw new BadRequest(SpecValueController.name, err);
     }
   }
 
@@ -57,7 +57,7 @@ export class SpecValueController {
       const cate = await this.specValueSerivce.update(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecValueController.name, err);
+      throw new BadRequest(SpecValueController.name, err);
     }
   }
 
@@ -68,7 +68,7 @@ export class SpecValueController {
       const cate = await this.specValueSerivce.remove(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecValueController.name, err);
+      throw new BadRequest(SpecValueController.name, err);
     }
   }
 }

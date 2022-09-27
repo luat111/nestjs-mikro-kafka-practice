@@ -1,10 +1,10 @@
-import { EntityRepository, wrap } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { EntityRepository, MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
+import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { Inject, Injectable } from '@nestjs/common';
 
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
 import SpecCategoryEntity from 'src/entities/spec-category.entity';
-import NotFoundRecordException from '../../core/exceptions/not-found.exception';
+import NotFoundRecord from '../../core/exceptions/not-found.exception';
 
 import { LoggerService } from '../logger/logger.service';
 
@@ -20,10 +20,17 @@ export class SpecCateService implements ISpecCategorySerivce {
   constructor(
     @Inject(LoggerService)
     private readonly logger: LoggerService,
+    @InjectMikroORM('dbLocal')
+    private readonly orm: MikroORM,
     @InjectRepository(SpecCategoryEntity, 'dbLocal')
     private readonly specCateRepo: EntityRepository<SpecCategoryEntity>,
   ) {
     this.logger.setContext(SpecCateService.name);
+  }
+
+  @UseRequestContext()
+  async commit(payload: ISpecCateogry | ISpecCateogry[]): Promise<void> {
+    await this.specCateRepo.persistAndFlush(payload);
   }
 
   async getAll(): Promise<ISpecCateogry[]> {
@@ -32,7 +39,9 @@ export class SpecCateService implements ISpecCategorySerivce {
       return cates;
     } catch (err) {
       this.logger.error(err.response.message || err.message);
-      throw new HttpBadRequestException(SpecCateService.name, err);
+      throw new BadRequest(SpecCateService.name, err);
+    } finally {
+      this.orm.em.clear();
     }
   }
 
@@ -47,23 +56,25 @@ export class SpecCateService implements ISpecCategorySerivce {
         },
       );
 
-      if (!cate) throw new NotFoundRecordException(id);
+      if (!cate) throw new NotFoundRecord(id);
 
       return cate;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecCateService.name, err);
+      throw new BadRequest(SpecCateService.name, err);
+    } finally {
+      this.orm.em.clear();
     }
   }
 
   async create(payload: CreateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
       const cate = this.specCateRepo.create(payload);
-      await this.specCateRepo.persistAndFlush(cate);
+      await this.commit(cate);
       return cate;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecCateService.name, err);
+      throw new BadRequest(SpecCateService.name, err);
     }
   }
 
@@ -72,15 +83,15 @@ export class SpecCateService implements ISpecCategorySerivce {
       const { id, ...rest } = payload;
       const cate = await this.getOne(id);
 
-      wrap(cate).assign({
+      const updatedCate = wrap(cate).assign({
         ...rest,
       });
 
-      await this.specCateRepo.persistAndFlush(cate);
-      return cate;
+      await this.commit(cate);
+      return updatedCate;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecCateService.name, err);
+      throw new BadRequest(SpecCateService.name, err);
     }
   }
 
@@ -91,7 +102,7 @@ export class SpecCateService implements ISpecCategorySerivce {
       return 'Delete successed';
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecCateService.name, err);
+      throw new BadRequest(SpecCateService.name, err);
     }
   }
 }

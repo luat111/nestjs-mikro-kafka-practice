@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { IsArray, IsOptional } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsOptional } from 'class-validator';
 import { UpdateProductDTO } from './update-product.dto';
 
 export class GetProductDTO extends OmitType(UpdateProductDTO, [

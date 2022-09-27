@@ -8,7 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetOneSpecCategoryDTO } from './dto/spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
@@ -26,7 +26,7 @@ export class SpecCateController {
       const cates = await this.specCateSerivce.getAll();
       return cates;
     } catch (err) {
-      throw new HttpBadRequestException(SpecCateController.name, err);
+      throw new BadRequest(SpecCateController.name, err);
     }
   }
 
@@ -37,7 +37,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.getOne(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecCateController.name, err);
+      throw new BadRequest(SpecCateController.name, err);
     }
   }
 
@@ -47,7 +47,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.create(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecCateController.name, err);
+      throw new BadRequest(SpecCateController.name, err);
     }
   }
 
@@ -57,7 +57,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.update(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecCateController.name, err);
+      throw new BadRequest(SpecCateController.name, err);
     }
   }
 
@@ -68,7 +68,7 @@ export class SpecCateController {
       const cate = await this.specCateSerivce.remove(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecCateController.name, err);
+      throw new BadRequest(SpecCateController.name, err);
     }
   }
 }

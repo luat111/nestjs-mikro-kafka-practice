@@ -12,7 +12,12 @@ import { SpecificationService } from './specification.service';
     LoggerModule,
   ],
   controllers: [SpecificationController],
-  providers: [SpecificationService],
-  exports: [SpecificationService],
+  providers: [
+    {
+      provide: 'ISpecificationService',
+      useClass: SpecificationService,
+    },
+  ],
+  exports: ['ISpecificationService'],
 })
 export class SpecificationModule {}

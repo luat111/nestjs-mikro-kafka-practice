@@ -3,22 +3,26 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
-  Put,
+  Put
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
 import ISpecification from 'src/entities/specification.entity';
 import { CreateSpecDTO } from './dto/create-spec.dto';
 import { GetOneSpecDTO } from './dto/spec.dto';
 import { UpdateSpecDTO } from './dto/update-spec.dto';
-import { SpecificationService } from './specification.service';
+import { ISpecificationService } from './interface/specification.interface';
 
 @ApiTags('specification')
 @Controller('specification')
 export class SpecificationController {
-  constructor(private readonly specSerivce: SpecificationService) {}
+  constructor(
+    @Inject('ISpecificationService')
+    private readonly specSerivce: ISpecificationService,
+  ) {}
 
   @Get()
   async getAll(): Promise<ISpecification[]> {
@@ -26,7 +30,7 @@ export class SpecificationController {
       const cates = await this.specSerivce.getAll();
       return cates;
     } catch (err) {
-      throw new HttpBadRequestException(SpecificationController.name, err);
+      throw new BadRequest(SpecificationController.name, err);
     }
   }
 
@@ -37,7 +41,7 @@ export class SpecificationController {
       const cate = await this.specSerivce.getOne(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecificationController.name, err);
+      throw new BadRequest(SpecificationController.name, err);
     }
   }
 
@@ -47,7 +51,7 @@ export class SpecificationController {
       const cate = await this.specSerivce.create(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecificationController.name, err);
+      throw new BadRequest(SpecificationController.name, err);
     }
   }
 
@@ -57,7 +61,7 @@ export class SpecificationController {
       const cate = await this.specSerivce.update(body);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecificationController.name, err);
+      throw new BadRequest(SpecificationController.name, err);
     }
   }
 
@@ -68,7 +72,7 @@ export class SpecificationController {
       const cate = await this.specSerivce.remove(id);
       return cate;
     } catch (err) {
-      throw new HttpBadRequestException(SpecificationController.name, err);
+      throw new BadRequest(SpecificationController.name, err);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsUUID } from 'class-validator';
 import { SpecValueDTO } from './spec-value.dto';
 
 export class CreateSpecValueDTO extends OmitType(SpecValueDTO, [
@@ -11,6 +11,6 @@ export class CreateSpecValueDTO extends OmitType(SpecValueDTO, [
 ]) {
   @ApiProperty()
   @IsOptional()
-  @IsString()
+  @IsUUID()
   specificaiton?: string;
 }

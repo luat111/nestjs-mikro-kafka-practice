@@ -1,9 +1,14 @@
-import { EntityRepository, wrap } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import {
+  EntityRepository,
+  MikroORM,
+  UseRequestContext,
+  wrap
+} from '@mikro-orm/core';
+import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { Inject, Injectable } from '@nestjs/common';
 
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
-import NotFoundRecordException from 'src/core/exceptions/not-found.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
+import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import SpecificationEntity from 'src/entities/specification.entity';
 
 import { LoggerService } from '../logger/logger.service';
@@ -17,10 +22,17 @@ export class SpecificationService {
   constructor(
     @Inject(LoggerService)
     private readonly logger: LoggerService,
+    @InjectMikroORM('dbLocal')
+    private readonly orm: MikroORM,
     @InjectRepository(SpecificationEntity, 'dbLocal')
     private readonly specRepo: EntityRepository<SpecificationEntity>,
   ) {
     this.logger.setContext(SpecificationService.name);
+  }
+
+  @UseRequestContext()
+  async commit(payload: ISpecification | ISpecification[]): Promise<void> {
+    await this.specRepo.persistAndFlush(payload);
   }
 
   async getAll(): Promise<ISpecification[]> {
@@ -29,13 +41,15 @@ export class SpecificationService {
       return specs;
     } catch (err) {
       this.logger.error(err.response.message || err.message);
-      throw new HttpBadRequestException(SpecificationService.name, err);
+      throw new BadRequest(SpecificationService.name, err);
+    } finally {
+      this.orm.em.clear();
     }
   }
 
   async getOne(id: string): Promise<ISpecification> {
     try {
-      const cate = await this.specRepo.findOne(
+      const spec = await this.specRepo.findOne(
         {
           id,
         },
@@ -44,51 +58,53 @@ export class SpecificationService {
         },
       );
 
-      if (!cate) throw new NotFoundRecordException(id);
+      if (!spec) throw new NotFoundRecord(id);
 
-      return cate;
+      return spec;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecificationService.name, err);
+      throw new BadRequest(SpecificationService.name, err);
+    } finally {
+      this.orm.em.clear();
     }
   }
 
   async create(payload: CreateSpecDTO): Promise<ISpecification> {
     try {
-      const cate = this.specRepo.create(payload);
-      await this.specRepo.persistAndFlush(cate);
-      return cate;
+      const spec = this.specRepo.create(payload);
+      await this.specRepo.persistAndFlush(spec);
+      return spec;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecificationService.name, err);
+      throw new BadRequest(SpecificationService.name, err);
     }
   }
 
   async update(payload: UpdateSpecDTO): Promise<ISpecification> {
     try {
       const { id, ...rest } = payload;
-      const cate = await this.getOne(id);
+      const spec = await this.getOne(id);
 
-      wrap(cate).assign({
+      wrap(spec).assign({
         ...rest,
       });
 
-      await this.specRepo.persistAndFlush(cate);
-      return cate;
+      await this.specRepo.persistAndFlush(spec);
+      return spec;
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecificationService.name, err);
+      throw new BadRequest(SpecificationService.name, err);
     }
   }
 
   async remove(id: string): Promise<string> {
     try {
-      const cate = await this.getOne(id);
-      await this.specRepo.removeAndFlush(cate);
+      const spec = await this.getOne(id);
+      await this.specRepo.removeAndFlush(spec);
       return 'Delete successed';
     } catch (err) {
       this.logger.error(err);
-      throw new HttpBadRequestException(SpecificationService.name, err);
+      throw new BadRequest(SpecificationService.name, err);
     }
   }
 }

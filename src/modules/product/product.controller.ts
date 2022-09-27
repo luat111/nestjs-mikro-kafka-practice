@@ -9,7 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import HttpBadRequestException from 'src/core/exceptions/bad-request.exception';
+import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { GetProductDTO } from './dto/get-product.dto';
 import { GetOneProductDTO } from './dto/product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
@@ -25,7 +25,7 @@ export class ProductController {
     try {
       return await this.productSerivce.syncProduct();
     } catch (err) {
-      throw new HttpBadRequestException(ProductController.name, err);
+      throw new BadRequest(ProductController.name, err);
     }
   }
 
@@ -36,7 +36,7 @@ export class ProductController {
     try {
       return await this.productSerivce.getAll(query);
     } catch (err) {
-      throw new HttpBadRequestException(ProductController.name, err);
+      throw new BadRequest(ProductController.name, err);
     }
   }
 
@@ -46,7 +46,7 @@ export class ProductController {
       const { id } = params;
       return await this.productSerivce.getOne(id);
     } catch (err) {
-      throw new HttpBadRequestException(ProductController.name, err);
+      throw new BadRequest(ProductController.name, err);
     }
   }
 
@@ -55,7 +55,7 @@ export class ProductController {
     try {
       return await this.productSerivce.update(body);
     } catch (err) {
-      throw new HttpBadRequestException(ProductController.name, err);
+      throw new BadRequest(ProductController.name, err);
     }
   }
 }

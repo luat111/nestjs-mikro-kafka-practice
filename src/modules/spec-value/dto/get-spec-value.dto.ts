@@ -1,5 +1,5 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
 import { IsArray, IsDateString, IsOptional, IsString } from 'class-validator';
 import { SpecValueDTO } from './spec-value.dto';
 
@@ -23,8 +23,12 @@ export class GetSpecValueDTO extends OmitType(SpecValueDTO, [
   @IsString()
   specificaiton?: string;
 
-  @ApiProperty()
-  @IsArray()
-  @Type(() => String)
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (value.includes(',')) return value.split(',');
+    return [value];
+  })
   products?: string[];
 }
