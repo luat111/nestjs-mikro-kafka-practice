@@ -7,11 +7,13 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import ISpecification from 'src/entities/specification.entity';
 import { CreateSpecDTO } from './dto/create-spec.dto';
+import { GetSpecDTO } from './dto/get-spec.dto';
 import { GetOneSpecDTO } from './dto/spec.dto';
 import { UpdateSpecDTO } from './dto/update-spec.dto';
 import { ISpecificationService } from './interface/specification.interface';
@@ -25,10 +27,20 @@ export class SpecificationController {
   ) {}
 
   @Get()
-  async getAll(): Promise<ISpecification[]> {
+  async getAll(@Query() query: GetSpecDTO): Promise<ISpecification[]> {
     try {
-      const cates = await this.specSerivce.getAll();
-      return cates;
+      const specs = await this.specSerivce.getAll(query);
+      return specs;
+    } catch (err) {
+      throw new BadRequest(SpecificationController.name, err);
+    }
+  }
+
+  @Get('filter')
+  async getFilter(): Promise<ISpecification[]> {
+    try {
+      const specs = await this.specSerivce.getFilter();
+      return specs;
     } catch (err) {
       throw new BadRequest(SpecificationController.name, err);
     }
@@ -38,8 +50,8 @@ export class SpecificationController {
   async getOne(@Param() params: GetOneSpecDTO): Promise<ISpecification> {
     try {
       const { id } = params;
-      const cate = await this.specSerivce.getOne(id);
-      return cate;
+      const spec = await this.specSerivce.getOne(id);
+      return spec;
     } catch (err) {
       throw new BadRequest(SpecificationController.name, err);
     }
@@ -48,8 +60,8 @@ export class SpecificationController {
   @Post()
   async create(@Body() body: CreateSpecDTO): Promise<ISpecification> {
     try {
-      const cate = await this.specSerivce.create(body);
-      return cate;
+      const spec = await this.specSerivce.create(body);
+      return spec;
     } catch (err) {
       throw new BadRequest(SpecificationController.name, err);
     }
@@ -58,8 +70,8 @@ export class SpecificationController {
   @Put()
   async update(@Body() body: UpdateSpecDTO): Promise<ISpecification> {
     try {
-      const cate = await this.specSerivce.update(body);
-      return cate;
+      const spec = await this.specSerivce.update(body);
+      return spec;
     } catch (err) {
       throw new BadRequest(SpecificationController.name, err);
     }
@@ -69,8 +81,8 @@ export class SpecificationController {
   async remove(@Param() params: GetOneSpecDTO): Promise<string> {
     try {
       const { id } = params;
-      const cate = await this.specSerivce.remove(id);
-      return cate;
+      const spec = await this.specSerivce.remove(id);
+      return spec;
     } catch (err) {
       throw new BadRequest(SpecificationController.name, err);
     }

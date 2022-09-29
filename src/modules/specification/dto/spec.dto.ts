@@ -24,6 +24,15 @@ export class SpecDTO {
   name: string;
 
   @ApiProperty()
+  @IsString()
+  url: string;
+
+  @ApiProperty()
+  @IsString()
+  @Type(() => Number)
+  indexPos: number;
+
+  @ApiProperty()
   @IsBoolean()
   isFilter: boolean;
 

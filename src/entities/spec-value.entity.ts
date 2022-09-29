@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import DefaultFormEntity from './default-form.entity';
 import ProductEntity from './product.entity';
 import SpecificationEntity from './specification.entity';
 
@@ -15,8 +16,14 @@ class SpecValueEntity {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'uuid_generate_v4()' })
   id!: string;
 
-  @Property({ nullable: false })
+  @Property({ nullable: false, unique: true })
   name: string;
+
+  @Property({ nullable: true })
+  url: string;
+
+  @Property({ default: 0 })
+  indexPos: number;
 
   @Property({ nullable: false, default: false })
   isFilter!: boolean;
@@ -48,6 +55,11 @@ class SpecValueEntity {
     cascade: [Cascade.ALL],
   })
   products: Collection<ProductEntity>;
+
+  @ManyToMany(() => DefaultFormEntity, (products) => products.specValues, {
+    cascade: [Cascade.ALL],
+  })
+  defaultForms: Collection<DefaultFormEntity>;
 }
 
 export default SpecValueEntity;

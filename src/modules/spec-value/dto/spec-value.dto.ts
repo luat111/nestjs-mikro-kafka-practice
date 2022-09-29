@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import ProductEntity from 'src/entities/product.entity';
 import { SpecDTO } from 'src/modules/specification/dto/spec.dto';
@@ -23,6 +24,16 @@ export class SpecValueDTO {
   name: string;
 
   @ApiProperty()
+  @IsString()
+  url: string;
+
+  @ApiProperty()
+  @IsString()
+  @Type(() => Number)
+  indexPos: number;
+
+  @ApiProperty()
+  @Type(() => Boolean)
   @IsBoolean()
   isFilter: boolean;
 
@@ -45,3 +56,9 @@ export class SpecValueDTO {
 }
 
 export class GetOneSpecValueDTO extends PickType(SpecValueDTO, ['id']) {}
+
+export class GetFilterSpecValue {
+  @ApiProperty()
+  @IsUUID()
+  specId: string;
+}

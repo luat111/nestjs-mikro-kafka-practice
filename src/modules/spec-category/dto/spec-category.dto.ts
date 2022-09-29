@@ -23,14 +23,26 @@ export class SpecCategoryDTO {
   name: string;
 
   @ApiProperty()
+  @IsString()
+  url: string;
+
+  @ApiProperty()
+  @IsString()
+  @Type(() => Number)
+  indexPos: number;
+
+  @ApiProperty()
+  @Type(() => Boolean)
   @IsBoolean()
   isAdvanced: boolean;
 
   @ApiProperty()
+  @Type(() => Boolean)
   @IsBoolean()
   hidden: boolean;
 
   @ApiProperty()
+  @Type(() => Boolean)
   @IsBoolean()
   isFilter: boolean;
 

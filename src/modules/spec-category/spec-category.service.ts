@@ -9,7 +9,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import SpecCategoryEntity from 'src/entities/spec-category.entity';
-import NotFoundRecord from '../../core/exceptions/not-found.exception';
+import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 
 import { LoggerService } from '../logger/logger.service';
 import { IProductSerivce } from '../product/interface/product.interface';
@@ -21,6 +21,7 @@ import {
   ISpecCategorySerivce,
   ISpecCateogry,
 } from './interface/spec-category.interface';
+import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 
 @Injectable()
 export class SpecCateService implements ISpecCategorySerivce {
@@ -44,9 +45,40 @@ export class SpecCateService implements ISpecCategorySerivce {
     await this.specCateRepo.persistAndFlush(payload);
   }
 
-  async getAll(): Promise<ISpecCateogry[]> {
+  async getAll(query: GetSpecCategoryDTO): Promise<ISpecCateogry[]> {
     try {
-      const cates = await this.specCateRepo.findAll();
+      const { page, pageLength, ...rest } = query;
+      const cates = await this.specCateRepo.find(
+        { ...rest },
+        {
+          offset: (page - 1) * pageLength,
+          limit: pageLength,
+        },
+      );
+      return cates;
+    } catch (err) {
+      this.logger.error(err);
+      throw new BadRequest(SpecCateService.name, err);
+    } finally {
+      this.orm.em.clear();
+    }
+  }
+
+  async getFilter(): Promise<ISpecCateogry[]> {
+    try {
+      const cates = await this.specCateRepo.find(
+        {
+          isFilter: true,
+        },
+        {
+          populate: ['specs'],
+          populateWhere: {
+            specs: {
+              isFilter: true,
+            },
+          },
+        },
+      );
       return cates;
     } catch (err) {
       this.logger.error(err);

@@ -7,11 +7,13 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
-import { GetOneSpecValueDTO } from './dto/spec-value.dto';
+import { GetSpecValueDTO } from './dto/get-spec-value.dto';
+import { GetFilterSpecValue, GetOneSpecValueDTO } from './dto/spec-value.dto';
 import { UpdateSpecValueDTO } from './dto/update-spec-value.dto';
 import {
   ISpecValue,
@@ -27,9 +29,20 @@ export class SpecValueController {
   ) {}
 
   @Get()
-  async getAll(): Promise<ISpecValue[]> {
+  async getAll(@Query() query: GetSpecValueDTO): Promise<ISpecValue[]> {
     try {
-      const cates = await this.specValueSerivce.getAll();
+      const cates = await this.specValueSerivce.getAll(query);
+      return cates;
+    } catch (err) {
+      throw new BadRequest(SpecValueController.name, err);
+    }
+  }
+
+  @Get('filter/:specId')
+  async getFilter(@Param() params: GetFilterSpecValue): Promise<ISpecValue[]> {
+    try {
+      const { specId } = params;
+      const cates = await this.specValueSerivce.getFilter(specId);
       return cates;
     } catch (err) {
       throw new BadRequest(SpecValueController.name, err);

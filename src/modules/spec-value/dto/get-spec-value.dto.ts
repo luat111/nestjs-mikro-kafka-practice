@@ -1,25 +1,38 @@
-import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  OmitType,
+  PartialType,
+} from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsOptional, IsString } from 'class-validator';
 import { SpecValueDTO } from './spec-value.dto';
 
-export class GetSpecValueDTO extends OmitType(SpecValueDTO, [
-  'specificaiton',
-  'products',
-  'createdAt',
-  'updatedAt',
-]) {
-  @ApiProperty()
+export class GetSpecValueDTO extends PartialType(
+  OmitType(SpecValueDTO, [
+    'name',
+    'url',
+    'specificaiton',
+    'products',
+    'createdAt',
+    'updatedAt',
+  ]),
+) {
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  createdAt?: string;
+  @Transform(({ value }) => {
+    return { $ilike: `%${value}%` };
+  })
+  name: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsOptional()
-  @IsDateString()
-  updatedAt?: string;
+  @Transform(({ value }) => {
+    return { $ilike: `%${value}%` };
+  })
+  url: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
   specificaiton?: string;
 
@@ -31,4 +44,12 @@ export class GetSpecValueDTO extends OmitType(SpecValueDTO, [
     return [value];
   })
   products?: string[];
+
+  @ApiProperty({ required: true, default: 1 })
+  @Type(() => Number)
+  page: number;
+
+  @ApiProperty({ required: true, default: 10 })
+  @Type(() => Number)
+  pageLength: number;
 }

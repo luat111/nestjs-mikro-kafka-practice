@@ -15,6 +15,7 @@ import { LoggerService } from '../logger/logger.service';
 import { IProductSerivce } from '../product/interface/product.interface';
 import { ISpecificationService } from '../specification/interface/specification.interface';
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
+import { GetSpecValueDTO } from './dto/get-spec-value.dto';
 import { UpdateSpecValueDTO } from './dto/update-spec-value.dto';
 import {
   ISpecValue,
@@ -42,9 +43,31 @@ export class SpecValueService implements ISpecValueService {
     await this.commit(payload);
   }
 
-  async getAll(): Promise<ISpecValue[]> {
+  async getAll(query: GetSpecValueDTO): Promise<ISpecValue[]> {
     try {
-      const specValues = await this.specValueRepo.findAll();
+      const { page, pageLength, ...rest } = query;
+      const specValues = await this.specValueRepo.find(
+        { ...rest },
+        {
+          offset: (page - 1) * pageLength,
+          limit: pageLength,
+        },
+      );
+      return specValues;
+    } catch (err) {
+      this.logger.error(err);
+      throw new BadRequest(SpecValueService.name, err);
+    } finally {
+      this.orm.em.clear();
+    }
+  }
+
+  async getFilter(specId: string): Promise<ISpecValue[]> {
+    try {
+      const specValues = await this.specValueRepo.find({
+        specification: specId,
+        isFilter: true,
+      });
       return specValues;
     } catch (err) {
       this.logger.error(err);

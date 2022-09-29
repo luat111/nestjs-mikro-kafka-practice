@@ -17,6 +17,7 @@ import { ISpecCategorySerivce } from '../spec-category/interface/spec-category.i
 import { ISpecValueService } from '../spec-value/interface/spec-value.interface';
 
 import { CreateSpecDTO } from './dto/create-spec.dto';
+import { GetSpecDTO } from './dto/get-spec.dto';
 import { UpdateSpecDTO } from './dto/update-spec.dto';
 import { ISpecification } from './interface/specification.interface';
 
@@ -44,9 +45,42 @@ export class SpecificationService {
     await this.commit(payload);
   }
 
-  async getAll(): Promise<ISpecification[]> {
+  async getAll(query: GetSpecDTO): Promise<ISpecification[]> {
     try {
-      const specs = await this.specRepo.findAll();
+      const { page, pageLength, ...rest } = query;
+      const specs = await this.specRepo.find(
+        {
+          ...rest,
+        },
+        {
+          offset: (page - 1) * pageLength,
+          limit: pageLength,
+        },
+      );
+      return specs;
+    } catch (err) {
+      this.logger.error(err);
+      throw new BadRequest(SpecificationService.name, err);
+    } finally {
+      this.orm.em.clear();
+    }
+  }
+
+  async getFilter(): Promise<ISpecification[]> {
+    try {
+      const specs = await this.specRepo.find(
+        {
+          isFilter: true,
+        },
+        {
+          populate: ['specValues'],
+          populateWhere: {
+            specValues: {
+              isFilter: true,
+            },
+          },
+        },
+      );
       return specs;
     } catch (err) {
       this.logger.error(err);

@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import DefaultFormEntity from './default-form.entity';
 import ProductEntity from './product.entity';
 import SpecificationEntity from './specification.entity';
 
@@ -17,6 +18,12 @@ class SpecCategoryEntity {
 
   @Property({ nullable: false, unique: true })
   name!: string;
+
+  @Property({ nullable: true })
+  url: string;
+
+  @Property({ default: 0 })
+  indexPos: number;
 
   @Property({ nullable: false, default: false })
   isAdvanced!: boolean;
@@ -51,6 +58,11 @@ class SpecCategoryEntity {
     cascade: [Cascade.ALL],
   })
   products: Collection<ProductEntity>;
+  
+  @ManyToMany(() => DefaultFormEntity, (products) => products.specCates, {
+    cascade: [Cascade.ALL],
+  })
+  defaultForms: Collection<DefaultFormEntity>;
 }
 
 export default SpecCategoryEntity;
