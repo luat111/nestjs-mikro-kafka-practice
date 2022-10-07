@@ -1,6 +1,7 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { forwardRef, Module } from '@nestjs/common';
 import SpecValueEntity from 'src/entities/spec-value.entity';
+import { DefaultFormModule } from '../default-form/default-form.module.';
 import { LoggerModule } from '../logger/logger.module';
 import { ProductModule } from '../product/product.module.';
 import { SpecificationModule } from '../specification/specification.module.';
@@ -14,6 +15,7 @@ import { SpecValueService } from './spec-value.service';
     LoggerModule,
     forwardRef(() => SpecificationModule),
     forwardRef(() => ProductModule),
+    forwardRef(() => DefaultFormModule),
   ],
   controllers: [SpecValueController],
   providers: [

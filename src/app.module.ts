@@ -23,7 +23,7 @@ import { SpecificationModule } from './modules/specification/specification.modul
     SpecificationModule,
     SpecCateModule,
     SpecValueModule,
-    DefaultFormModule
+    DefaultFormModule,
   ],
   controllers: [AppController],
   providers: [AppService],

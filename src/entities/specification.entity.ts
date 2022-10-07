@@ -40,7 +40,7 @@ class SpecificationEntity {
   @Property({
     columnType: 'timestamp',
     defaultRaw: 'current_timestamp',
-    extra: 'on update current_timestamp',
+    onUpdate: () => new Date(),
     getter: true,
   })
   updatedAt!: Date;

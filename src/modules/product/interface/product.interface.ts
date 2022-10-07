@@ -10,6 +10,7 @@ export interface IProductSerivce {
   getAllPublish(query: GetProductDTO): Promise<IProduct[]>;
   update(payload: UpdateProductDTO): Promise<IProduct>;
   create(payload: CreateProductDTO): Promise<IProduct>;
+  cloneSpec(idProduct: string, idDefaultForm: string): Promise<IProduct>;
 }
 
 export type IProduct = ProductEntity;

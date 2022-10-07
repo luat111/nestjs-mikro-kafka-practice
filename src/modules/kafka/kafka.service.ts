@@ -34,6 +34,7 @@ export class KafkaService {
       const instance = new Kafka({
         clientId: this.config.get<string>('kafka.clientId'),
         brokers: [this.config.get<string>('kafka.broker')],
+        logCreator: this.customLogger(),
       });
       return instance;
     } catch (err) {
@@ -63,5 +64,12 @@ export class KafkaService {
     } catch (err) {
       this.logger.error(err);
     }
+  }
+
+  customLogger() {
+    return () =>
+      ({ level, log }) => {
+        this.logger.logKafka(level, JSON.stringify(log));
+      };
   }
 }

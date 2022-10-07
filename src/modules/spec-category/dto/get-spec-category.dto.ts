@@ -14,6 +14,7 @@ export class GetSpecCategoryDTO extends PartialType(
     'url',
     'specs',
     'products',
+    'defaultForms',
     'createdAt',
     'updatedAt',
   ]),
@@ -49,6 +50,15 @@ export class GetSpecCategoryDTO extends PartialType(
     return [value];
   })
   products?: string[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (value.includes(',')) return value.split(',');
+    return [value];
+  })
+  defaultForms?: string[];
 
   @ApiProperty({ required: true, default: 1 })
   @Type(() => Number)

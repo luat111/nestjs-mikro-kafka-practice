@@ -10,6 +10,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import SpecificationEntity from 'src/entities/specification.entity';
+import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 
 import { LoggerService } from '../logger/logger.service';
 import { IProductSerivce } from '../product/interface/product.interface';
@@ -36,6 +37,8 @@ export class SpecificationService {
     private readonly specValueService: ISpecValueService,
     @Inject('IProductService')
     private readonly productService: IProductSerivce,
+    @Inject(forwardRef(() => 'IDefaultFormService'))
+    private readonly defaultFormService: IDefaultFormService,
   ) {
     this.logger.setContext(SpecificationService.name);
   }
@@ -97,7 +100,7 @@ export class SpecificationService {
           id,
         },
         {
-          populate: ['cate', 'products', 'specValues'],
+          populate: ['cate', 'products', 'specValues', 'defaultForms'],
         },
       );
 
@@ -127,25 +130,39 @@ export class SpecificationService {
 
   async update(payload: UpdateSpecDTO): Promise<ISpecification> {
     try {
-      const { id, cate, products, specValues, ...rest } = payload;
+      const { id, cate, products, specValues, defaultForms, ...rest } = payload;
       const spec = await this.getOne(id);
 
       cate && this.specCateService.getOne(cate);
 
-      specValues.length &&
+      specValues &&
+        specValues.length &&
         (await Promise.all(
           specValues.map(
             async (valueId) => await this.specValueService.getOne(valueId),
           ),
         ));
 
-      products.length &&
+      products &&
+        products.length &&
         (await Promise.all(
           products.map(async (pId) => await this.productService.getOne(pId)),
         ));
 
+      defaultForms &&
+        defaultForms.length &&
+        (await Promise.all(
+          defaultForms.map(
+            async (pId) => await this.defaultFormService.getOne(pId),
+          ),
+        ));
+
       const updatedSpec = wrap(spec).assign({
         ...rest,
+        cate: cate || spec.cate,
+        specValues: specValues || spec.specValues,
+        products: products || spec.products,
+        defaultForms: defaultForms || spec.defaultForms,
       });
 
       await this.commit(updatedSpec);

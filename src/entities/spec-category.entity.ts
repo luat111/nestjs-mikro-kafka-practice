@@ -44,8 +44,8 @@ class SpecCategoryEntity {
   @Property({
     columnType: 'timestamp',
     defaultRaw: 'current_timestamp',
-    extra: 'on update current_timestamp',
     getter: true,
+    onUpdate: () => new Date(),
   })
   updatedAt!: Date;
 
@@ -58,7 +58,7 @@ class SpecCategoryEntity {
     cascade: [Cascade.ALL],
   })
   products: Collection<ProductEntity>;
-  
+
   @ManyToMany(() => DefaultFormEntity, (products) => products.specCates, {
     cascade: [Cascade.ALL],
   })

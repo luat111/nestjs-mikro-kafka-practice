@@ -1,23 +1,31 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsUUID } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
 import { SpecValueDTO } from './spec-value.dto';
 
 export class UpdateSpecValueDTO extends OmitType(PartialType(SpecValueDTO), [
-  'specificaiton',
+  'specification',
   'products',
+  'defaultForms',
   'updatedAt',
   'createdAt',
 ]) {
   @ApiProperty()
   @IsOptional()
-  @IsUUID()
-  specificaiton?: string;
+  @IsString({ each: true })
+  specification?: string;
 
   @ApiProperty()
   @IsOptional()
   @IsArray()
-  @IsUUID(null, { each: true })
   @Type(() => String)
+  @IsString({ each: true })
   products?: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @Type(() => String)
+  @IsString({ each: true })
+  defaultForms?: string[];
 }

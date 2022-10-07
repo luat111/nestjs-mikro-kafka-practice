@@ -12,8 +12,9 @@ export class GetSpecValueDTO extends PartialType(
   OmitType(SpecValueDTO, [
     'name',
     'url',
-    'specificaiton',
+    'specification',
     'products',
+    'defaultForms',
     'createdAt',
     'updatedAt',
   ]),
@@ -34,7 +35,7 @@ export class GetSpecValueDTO extends PartialType(
 
   @ApiPropertyOptional()
   @IsString()
-  specificaiton?: string;
+  specification?: string;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
@@ -44,6 +45,15 @@ export class GetSpecValueDTO extends PartialType(
     return [value];
   })
   products?: string[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value;
+    if (value.includes(',')) return value.split(',');
+    return [value];
+  })
+  defaultForms?: string[];
 
   @ApiProperty({ required: true, default: 1 })
   @Type(() => Number)

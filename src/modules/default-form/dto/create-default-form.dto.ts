@@ -11,21 +11,21 @@ export class CreateDefaultFormDTO extends OmitType(DefaultFormDTO, [
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  @IsUUID(null, { each: true })
+  
   @Type(() => String)
   specs?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  @IsUUID(null, { each: true })
+  
   @Type(() => String)
   specValues?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  @IsUUID(null, { each: true })
+  
   @Type(() => String)
   specCates?: string[];
 }

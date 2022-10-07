@@ -2,26 +2,27 @@ import {
   EntityRepository,
   MikroORM,
   UseRequestContext,
-  wrap,
+  wrap
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
-import SpecCategoryEntity from 'src/entities/spec-category.entity';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
+import SpecCategoryEntity from 'src/entities/spec-category.entity';
 
 import { LoggerService } from '../logger/logger.service';
 import { IProductSerivce } from '../product/interface/product.interface';
 import { ISpecificationService } from '../specification/interface/specification.interface';
 
+import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
+import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
 import {
   ISpecCategorySerivce,
-  ISpecCateogry,
+  ISpecCateogry
 } from './interface/spec-category.interface';
-import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 
 @Injectable()
 export class SpecCateService implements ISpecCategorySerivce {
@@ -36,6 +37,8 @@ export class SpecCateService implements ISpecCategorySerivce {
     private readonly productService: IProductSerivce,
     @Inject(forwardRef(() => 'ISpecificationService'))
     private readonly specService: ISpecificationService,
+    @Inject(forwardRef(() => 'IDefaultFormService'))
+    private readonly defaultFormService: IDefaultFormService,
   ) {
     this.logger.setContext(SpecCateService.name);
   }
@@ -95,7 +98,7 @@ export class SpecCateService implements ISpecCategorySerivce {
           id,
         },
         {
-          populate: ['specs', 'products'],
+          populate: ['specs', 'products', 'defaultForms'],
         },
       );
 
@@ -123,7 +126,7 @@ export class SpecCateService implements ISpecCategorySerivce {
 
   async update(payload: UpdateSpecCategoryDTO): Promise<ISpecCateogry> {
     try {
-      const { id, specs, products, ...rest } = payload;
+      const { id, specs, products, defaultForms, ...rest } = payload;
       const cate = await this.getOne(id);
 
       specs &&
@@ -131,13 +134,25 @@ export class SpecCateService implements ISpecCategorySerivce {
           specs.map(async (specId) => await this.specService.getOne(specId)),
         ));
 
-      products.length &&
+      products &&
+        products.length &&
         (await Promise.all(
           products.map(async (pId) => await this.productService.getOne(pId)),
         ));
 
+      defaultForms &&
+        defaultForms.length &&
+        (await Promise.all(
+          defaultForms.map(
+            async (pId) => await this.defaultFormService.getOne(pId),
+          ),
+        ));
+
       const updatedCate = wrap(cate).assign({
         ...rest,
+        specs: specs || cate.specs,
+        products: products || cate.products,
+        defaultForms: defaultForms || cate.defaultForms,
       });
 
       await this.commit(cate);

@@ -4,13 +4,14 @@ import { SpecValueDTO } from './spec-value.dto';
 
 export class CreateSpecValueDTO extends OmitType(SpecValueDTO, [
   'id',
-  'specificaiton',
+  'specification',
   'products',
+  'defaultForms',
   'createdAt',
   'updatedAt',
 ]) {
   @ApiProperty()
   @IsOptional()
   @IsUUID()
-  specificaiton?: string;
+  specification?: string;
 }

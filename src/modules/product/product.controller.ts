@@ -4,6 +4,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Put,
   Query,
 } from '@nestjs/common';
@@ -54,6 +55,16 @@ export class ProductController {
   async update(@Body() body: UpdateProductDTO) {
     try {
       return await this.productSerivce.update(body);
+    } catch (err) {
+      throw new BadRequest(ProductController.name, err);
+    }
+  }
+
+  @Patch(':id/form/:form')
+  async cloneSpec(@Param() params: any) {
+    try {
+      const { id, form } = params;
+      return await this.productSerivce.cloneSpec(id, form);
     } catch (err) {
       throw new BadRequest(ProductController.name, err);
     }

@@ -1,4 +1,5 @@
 import { ConsoleLogger, Injectable, Scope } from '@nestjs/common';
+import { logLevel } from 'kafkajs';
 
 @Injectable({ scope: Scope.TRANSIENT })
 export class LoggerService extends ConsoleLogger {
@@ -22,5 +23,22 @@ export class LoggerService extends ConsoleLogger {
 
   warn(message: any) {
     super.warn(message, this.context);
+  }
+
+  logKafka(level: number, message: any) {
+    switch (level) {
+      case logLevel.NOTHING:
+        this.log(message);
+      case logLevel.INFO:
+        this.log(message);
+      case logLevel.ERROR:
+        this.error(message);
+      case logLevel.WARN:
+        this.warn(message);
+      case logLevel.DEBUG:
+        this.log(message);
+      default:
+        this.log(message);
+    }
   }
 }

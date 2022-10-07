@@ -5,11 +5,13 @@ import {
   IsBoolean,
   IsDate,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
-import ProductEntity from 'src/entities/product.entity';
+import { DefaultFormDTO } from 'src/modules/default-form/dto/default-form.dto';
+import { ProductDTO } from 'src/modules/product/dto/product.dto';
 import { SpecDTO } from 'src/modules/specification/dto/spec.dto';
 
 export class SpecValueDTO {
@@ -28,8 +30,8 @@ export class SpecValueDTO {
   url: string;
 
   @ApiProperty()
-  @IsString()
   @Type(() => Number)
+  @IsNumber()
   indexPos: number;
 
   @ApiProperty()
@@ -48,11 +50,15 @@ export class SpecValueDTO {
   updatedAt?: Date;
 
   @Type(() => SpecDTO)
-  specificaiton: SpecDTO;
+  specification: SpecDTO;
 
   @IsArray()
-  @Type(() => ProductEntity)
-  products: ProductEntity[];
+  @Type(() => ProductDTO)
+  products: ProductDTO[];
+
+  @IsArray()
+  @Type(() => DefaultFormDTO)
+  defaultForms: DefaultFormDTO[];
 }
 
 export class GetOneSpecValueDTO extends PickType(SpecValueDTO, ['id']) {}

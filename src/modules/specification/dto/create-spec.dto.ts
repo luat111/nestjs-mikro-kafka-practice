@@ -6,6 +6,7 @@ export class CreateSpecDTO extends OmitType(SpecDTO, [
   'id',
   'specValues',
   'products',
+  'defaultForms',
   'cate',
   'createdAt',
   'updatedAt',

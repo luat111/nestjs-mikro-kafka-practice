@@ -14,7 +14,7 @@ import BadRequest from 'src/core/exceptions/bad-request.exception';
 import { GetDefaultFormDTO } from './dto/get-default-form.dto';
 import { GetOneDefaultFormDTO } from './dto/default-form.dto';
 import { UpdateDefaultFormDTO } from './dto/update-default-form.dto';
-import { IDefaultFormSerivce } from './interface/default-form.interface';
+import { IDefaultFormService } from './interface/default-form.interface';
 import { CreateDefaultFormDTO } from './dto/create-default-form.dto';
 
 @ApiTags('default-forms')
@@ -22,7 +22,7 @@ import { CreateDefaultFormDTO } from './dto/create-default-form.dto';
 export class DefaultFormController {
   constructor(
     @Inject('IDefaultFormService')
-    private readonly defaultFormSerivce: IDefaultFormSerivce,
+    private readonly defaultFormSerivce: IDefaultFormService,
   ) {}
 
   @Get()
