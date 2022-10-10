@@ -211,7 +211,7 @@ export class ProductService implements IProductSerivce {
   async syncProduct(): Promise<IProduct[]> {
     try {
       const productStg = await this.productRepoStg.findAll({
-        fields: ['id', 'publish'],
+        fields: ['id', 'name', 'publish'],
         filters: { getPublish: false },
       });
 
@@ -222,9 +222,9 @@ export class ProductService implements IProductSerivce {
 
       const newProduct: ProductEntity[] = productStg.reduce((newArr, p) => {
         if (!productLocal.some((e) => e.id === p.id)) {
-          const { id, publish } = p;
+          const { id, name, publish } = p;
           newArr.push(
-            this.productRepoLocal.create<ProductEntity>({ id, publish }),
+            this.productRepoLocal.create<ProductEntity>({ id, name, publish }),
           );
         }
         return newArr;

@@ -23,6 +23,9 @@ class ProductEntity {
   @PrimaryKey()
   id: string;
 
+  @Property({ nullable: false})
+  name: string;
+
   @Property()
   publish: boolean;
 

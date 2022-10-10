@@ -8,6 +8,10 @@ export class ProductDTO {
   @ApiProperty()
   @IsString()
   id: string;
+ 
+  @ApiProperty()
+  @IsString()
+  name: string;
 
   @ApiProperty()
   @IsBoolean()
