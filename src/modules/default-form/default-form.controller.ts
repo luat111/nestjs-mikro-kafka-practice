@@ -47,7 +47,7 @@ export class DefaultFormController {
   @Post()
   async create(@Body() body: CreateDefaultFormDTO) {
     try {
-      return await this.defaultFormSerivce.update(body);
+      return await this.defaultFormSerivce.create(body);
     } catch (err) {
       throw new BadRequest(DefaultFormController.name, err);
     }

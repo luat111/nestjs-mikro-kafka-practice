@@ -45,7 +45,7 @@ export class SpecificationService {
 
   @UseRequestContext()
   async commit(payload: ISpecification | ISpecification[]): Promise<void> {
-    await this.commit(payload);
+    await this.specRepo.persistAndFlush(payload);
   }
 
   async getAll(query: GetSpecDTO): Promise<ISpecification[]> {

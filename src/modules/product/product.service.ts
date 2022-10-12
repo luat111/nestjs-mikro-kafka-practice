@@ -1,10 +1,10 @@
-import { MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
+import { MikroORM, PopulateHint, UseRequestContext, wrap } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EachMessagePayload } from 'kafkajs';
-
+import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
 import ProductEntity from 'src/entities/product.entity';
@@ -14,6 +14,11 @@ import { KafkaService } from '../kafka/kafka.service';
 import { LoggerService } from '../logger/logger.service';
 import { ISpecCategorySerivce } from '../spec-category/interface/spec-category.interface';
 import { ISpecValueService } from '../spec-value/interface/spec-value.interface';
+import { ISpecificationService } from '../specification/interface/specification.interface';
+import { CreateProductDTO } from './dto/create-product.dto';
+import { GetProductDTO } from './dto/get-product.dto';
+import { UpdateProductDTO } from './dto/update-product.dto';
+import { IProduct, IProductSerivce } from './interface/product.interface';
 import { ISpecificationService } from '../specification/interface/specification.interface';
 import { CreateProductDTO } from './dto/create-product.dto';
 import { GetProductDTO } from './dto/get-product.dto';
@@ -76,24 +81,22 @@ export class ProductService implements IProductSerivce {
       const product = await this.productRepoLocal.findOne(
         {
           id: id,
+          specCates: {
+            $or: [
+              { defaultForms: id },
+              {
+                specs: {
+                  specValues: {
+                    defaultForms: id,
+                  },
+                },
+              },
+            ],
+          },
         },
         {
-          populate: [
-            'specCates',
-            'specCates.specs',
-            'specCates.specs.specValues',
-          ],
-          populateWhere: {
-            specCates: {
-              products: id,
-            },
-            specs: {
-              products: id,
-            },
-            specValues: {
-              products: id,
-            },
-          },
+          populate: ['specCates.specs.specValues'],
+          populateWhere: PopulateHint.INFER,
         },
       );
 

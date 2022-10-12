@@ -4,6 +4,7 @@ import { IsArray, IsOptional, IsUUID } from 'class-validator';
 import { DefaultFormDTO } from './default-form.dto';
 
 export class CreateDefaultFormDTO extends OmitType(DefaultFormDTO, [
+  'id',
   'specs',
   'specValues',
   'specCates',

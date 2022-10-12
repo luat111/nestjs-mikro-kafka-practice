@@ -1,4 +1,9 @@
-import { MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
+import {
+  MikroORM,
+  PopulateHint,
+  UseRequestContext,
+  wrap,
+} from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -47,24 +52,22 @@ export class DefaultFormService implements IDefaultFormService {
       const defaultForm = await this.defaultFormRepo.findOne(
         {
           id: id,
+          specCates: {
+            $or: [
+              { defaultForms: id },
+              {
+                specs: {
+                  specValues: {
+                    defaultForms: id,
+                  },
+                },
+              },
+            ],
+          },
         },
         {
-          populate: [
-            'specCates',
-            'specCates.specs',
-            'specCates.specs.specValues',
-          ],
-          populateWhere: {
-            specCates: {
-              defaultForms: id,
-            },
-            specs: {
-              defaultForms: id,
-            },
-            specValues: {
-              defaultForms: id,
-            },
-          },
+          populate: ['specCates.specs.specValues'],
+          populateWhere: PopulateHint.INFER,
         },
       );
 
@@ -98,7 +101,14 @@ export class DefaultFormService implements IDefaultFormService {
 
   async getAll(query: GetDefaultFormDTO): Promise<IDefaultForm[]> {
     try {
-      const defaultForms = await this.defaultFormRepo.find({ ...query });
+      const { page, pageLength, ...rest } = query;
+      const defaultForms = await this.defaultFormRepo.find(
+        { ...rest },
+        {
+          offset: (page - 1) * pageLength,
+          limit: pageLength,
+        },
+      );
       return defaultForms;
     } catch (err) {
       this.logger.error(err);

@@ -35,6 +35,7 @@ export class GetSpecDTO extends PartialType(
   url: string;
 
   @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   cate?: string;
 

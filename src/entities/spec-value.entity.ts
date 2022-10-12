@@ -56,7 +56,7 @@ class SpecValueEntity {
   })
   products: Collection<ProductEntity>;
 
-  @ManyToMany(() => DefaultFormEntity, (products) => products.specValues, {
+  @ManyToMany(() => DefaultFormEntity, (form) => form.specValues, {
     cascade: [Cascade.ALL],
   })
   defaultForms: Collection<DefaultFormEntity>;

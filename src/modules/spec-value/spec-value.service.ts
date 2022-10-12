@@ -43,7 +43,7 @@ export class SpecValueService implements ISpecValueService {
 
   @UseRequestContext()
   async commit(payload: ISpecValue | ISpecValue[]): Promise<void> {
-    await this.commit(payload);
+    await this.specValueRepo.persistAndFlush(payload);
   }
 
   async getAll(query: GetSpecValueDTO): Promise<ISpecValue[]> {
