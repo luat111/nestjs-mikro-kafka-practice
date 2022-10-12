@@ -2,7 +2,7 @@ import {
   EntityRepository,
   MikroORM,
   UseRequestContext,
-  wrap
+  wrap,
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -21,7 +21,7 @@ import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
 import {
   ISpecCategorySerivce,
-  ISpecCateogry
+  ISpecCateogry,
 } from './interface/spec-category.interface';
 
 @Injectable()

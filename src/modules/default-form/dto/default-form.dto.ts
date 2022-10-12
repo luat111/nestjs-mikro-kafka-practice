@@ -8,7 +8,7 @@ export class DefaultFormDTO {
   @ApiProperty()
   @IsString()
   id: string;
-  
+
   @ApiProperty()
   @IsString()
   name: string;

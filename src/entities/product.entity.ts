@@ -23,7 +23,7 @@ class ProductEntity {
   @PrimaryKey()
   id: string;
 
-  @Property({ nullable: false})
+  @Property({ nullable: false })
   name: string;
 
   @Property()

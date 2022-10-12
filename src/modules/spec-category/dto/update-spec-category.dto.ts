@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 import { SpecCategoryDTO } from './spec-category.dto';
 
 export class UpdateSpecCategoryDTO extends OmitType(

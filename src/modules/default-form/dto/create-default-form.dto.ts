@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsOptional, IsUUID } from 'class-validator';
+import { IsArray, IsOptional } from 'class-validator';
 import { DefaultFormDTO } from './default-form.dto';
 
 export class CreateDefaultFormDTO extends OmitType(DefaultFormDTO, [
@@ -12,21 +12,18 @@ export class CreateDefaultFormDTO extends OmitType(DefaultFormDTO, [
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  
   @Type(() => String)
   specs?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  
   @Type(() => String)
   specValues?: string[];
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsArray()
-  
   @Type(() => String)
   specCates?: string[];
 }
