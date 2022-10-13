@@ -1,9 +1,4 @@
-import {
-  MikroORM,
-  PopulateHint,
-  UseRequestContext,
-  wrap,
-} from '@mikro-orm/core';
+import { MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -52,22 +47,31 @@ export class DefaultFormService implements IDefaultFormService {
       const defaultForm = await this.defaultFormRepo.findOne(
         {
           id: id,
-          specCates: {
-            $or: [
-              { defaultForms: id },
-              {
-                specs: {
-                  specValues: {
-                    defaultForms: id,
-                  },
-                },
-              },
-            ],
-          },
         },
         {
-          populate: ['specCates.specs.specValues'],
-          populateWhere: PopulateHint.INFER,
+          populate: ['specCates.specs.specValues', 'specs', 'specValues'],
+          populateWhere: {
+            specCates: {
+              $or: [
+                { defaultForms: id },
+                {
+                  specs: {
+                    $or: [
+                      { defaultForms: id },
+                      {
+                        specValues: {
+                          defaultForms: id,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            specValues: {
+              defaultForms: id,
+            },
+          },
         },
       );
 
@@ -150,22 +154,60 @@ export class DefaultFormService implements IDefaultFormService {
 
   async update(payload: UpdateDefaultFormDTO): Promise<DefaultFormEntity> {
     try {
-      const { id, specCates, specValues, specs, ...rest } = payload;
+      let { id, specCates, specValues, specs, ...rest } = payload;
       const defaultForm = await this.getOne(id);
 
-      specCates &&
-        specCates.length &&
-        (await Promise.all(
+      if (specCates && specCates.length) {
+        await Promise.all(
           specCates.map((cate) => this.specCateService.getOne(cate)),
-        ));
+        );
+
+        for (const spec of defaultForm.specs) {
+          if (!specCates.includes(spec.cate.id)) {
+            defaultForm.specs.remove(spec);
+          }
+        }
+      }
+
+      if (specs && specs.length) {
+        await Promise.all(
+          specs.map(async (spec) => {
+            const specRecord = await this.specService.getOne(spec);
+            if (
+              defaultForm.specCates
+                .toArray()
+                .every((cate) => cate.id !== specRecord.cate.id) &&
+              !(specCates && !specCates.includes(spec))
+            )
+              specs = specs.filter((e) => e !== spec);
+
+            return specRecord;
+          }),
+        );
+
+        for (const specValue of defaultForm.specValues) {
+          if (!specs.includes(specValue.specification.id)) {
+            defaultForm.specValues.remove(specValue);
+          }
+        }
+      }
+
       specValues &&
         specValues.length &&
         (await Promise.all(
-          specValues.map((value) => this.specValueService.getOne(value)),
+          specValues.map(async (value) => {
+            const specValue = await this.specValueService.getOne(value);
+            if (
+              !defaultForm.specs
+                .toArray()
+                .some((spec) => spec.id === specValue.specification.id) &&
+              !(specs && specs.includes(value))
+            )
+              specValues = specValues.filter((e) => e !== value);
+
+            return specValue;
+          }),
         ));
-      specs &&
-        specs.length &&
-        (await Promise.all(specs.map((spec) => this.specService.getOne(spec))));
 
       const updatedDefaultForm = wrap(defaultForm).assign({
         ...rest,
@@ -176,7 +218,7 @@ export class DefaultFormService implements IDefaultFormService {
 
       await this.commit(updatedDefaultForm);
 
-      return updatedDefaultForm;
+      return await this.getOne(id);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(DefaultFormService.name, err);

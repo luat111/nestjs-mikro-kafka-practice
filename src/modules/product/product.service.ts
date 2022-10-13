@@ -1,9 +1,4 @@
-import {
-  MikroORM,
-  PopulateHint,
-  UseRequestContext,
-  wrap,
-} from '@mikro-orm/core';
+import { MikroORM, UseRequestContext, wrap } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -80,22 +75,31 @@ export class ProductService implements IProductSerivce {
       const product = await this.productRepoLocal.findOne(
         {
           id: id,
-          specCates: {
-            $or: [
-              { defaultForms: id },
-              {
-                specs: {
-                  specValues: {
-                    defaultForms: id,
-                  },
-                },
-              },
-            ],
-          },
         },
         {
-          populate: ['specCates.specs.specValues'],
-          populateWhere: PopulateHint.INFER,
+          populate: ['specCates.specs.specValues', 'specs', 'specValues'],
+          populateWhere: {
+            specCates: {
+              $or: [
+                { defaultForms: id },
+                {
+                  specs: {
+                    $or: [
+                      { defaultForms: id },
+                      {
+                        specValues: {
+                          defaultForms: id,
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            specValues: {
+              defaultForms: id,
+            },
+          },
         },
       );
 
@@ -154,22 +158,60 @@ export class ProductService implements IProductSerivce {
 
   async update(payload: UpdateProductDTO): Promise<ProductEntity> {
     try {
-      const { id, specCates, specValues, specs, ...rest } = payload;
+      let { id, specCates, specValues, specs, ...rest } = payload;
       const product = await this.getOne(id);
 
-      specCates &&
-        specCates.length &&
-        (await Promise.all(
+      if (specCates && specCates.length) {
+        await Promise.all(
           specCates.map((cate) => this.specCateService.getOne(cate)),
-        ));
+        );
+
+        for (const spec of product.specs) {
+          if (!specCates.includes(spec.cate.id)) {
+            product.specs.remove(spec);
+          }
+        }
+      }
+
+      if (specs && specs.length) {
+        await Promise.all(
+          specs.map(async (spec) => {
+            const specRecord = await this.specService.getOne(spec);
+            if (
+              product.specCates
+                .toArray()
+                .every((cate) => cate.id !== specRecord.cate.id) &&
+              !(specCates && !specCates.includes(spec))
+            )
+              specs = specs.filter((e) => e !== spec);
+
+            return specRecord;
+          }),
+        );
+
+        for (const specValue of product.specValues) {
+          if (!specs.includes(specValue.specification.id)) {
+            product.specValues.remove(specValue);
+          }
+        }
+      }
+
       specValues &&
         specValues.length &&
         (await Promise.all(
-          specValues.map((value) => this.specValueService.getOne(value)),
+          specValues.map(async (value) => {
+            const specValue = await this.specValueService.getOne(value);
+            if (
+              !product.specs
+                .toArray()
+                .some((spec) => spec.id === specValue.specification.id) &&
+              !(specs && specs.includes(value))
+            )
+              specValues = specValues.filter((e) => e !== value);
+
+            return specValue;
+          }),
         ));
-      specs &&
-        specs.length &&
-        (await Promise.all(specs.map((spec) => this.specService.getOne(spec))));
 
       const updatedProduct = wrap(product).assign({
         ...rest,

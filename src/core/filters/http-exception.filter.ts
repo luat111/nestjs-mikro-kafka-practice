@@ -8,7 +8,7 @@ import { FastifyReply } from 'fastify';
 
 interface IValidation {
   status: number;
-  message: string[];
+  message: string;
   error: string;
 }
 
@@ -23,7 +23,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.send({
       status: false,
       code: statusCode,
-      message: validateMessage.message || message || 'Something went wrong',
+      message:
+        validateMessage.message.substring(
+          validateMessage.message.lastIndexOf(']') + 1,
+        ) ||
+        message ||
+        'Something went wrong',
     });
   }
 }
