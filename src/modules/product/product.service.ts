@@ -49,16 +49,16 @@ export class ProductService implements IProductSerivce {
   }
 
   async onModuleInit() {
-    await this.kafkaService.consume(
-      {
-        topics: [this.configService.get<string>('kafka.topic')],
-        fromBeginning: true,
-      },
-      {
-        eachMessage: (message: EachMessagePayload) =>
-          this.handleMessage(message),
-      },
-    );
+    // await this.kafkaService.consume(
+    //   {
+    //     topics: [this.configService.get<string>('kafka.topic')],
+    //     fromBeginning: true,
+    //   },
+    //   {
+    //     eachMessage: (message: EachMessagePayload) =>
+    //       this.handleMessage(message),
+    //   },
+    // );
   }
 
   async handleMessage({ message }: EachMessagePayload) {
@@ -81,14 +81,14 @@ export class ProductService implements IProductSerivce {
           populateWhere: {
             specCates: {
               $or: [
-                { defaultForms: id },
+                { products: id },
                 {
                   specs: {
                     $or: [
-                      { defaultForms: id },
+                      { products: id },
                       {
                         specValues: {
-                          defaultForms: id,
+                          products: id,
                         },
                       },
                     ],
@@ -97,7 +97,7 @@ export class ProductService implements IProductSerivce {
               ],
             },
             specValues: {
-              defaultForms: id,
+              products: id,
             },
           },
         },
@@ -116,7 +116,11 @@ export class ProductService implements IProductSerivce {
 
   async getAll(query: GetProductDTO): Promise<IProduct[]> {
     try {
-      const products = await this.productRepoLocal.find({ ...query });
+      const { page, pageLength, ...rest } = query;
+      const [products] = await this.productRepoLocal.findAndCount(
+        { ...rest },
+        { offset: pageLength * (page - 1), limit: pageLength },
+      );
       return products;
     } catch (err) {
       this.logger.error(err);
@@ -222,7 +226,7 @@ export class ProductService implements IProductSerivce {
 
       await this.commit(updatedProduct);
 
-      return updatedProduct;
+      return await this.getOne(id);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(ProductService.name, err);

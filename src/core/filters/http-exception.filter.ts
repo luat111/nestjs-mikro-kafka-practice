@@ -24,9 +24,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       status: false,
       code: statusCode,
       message:
-        validateMessage.message.substring(
-          validateMessage.message.lastIndexOf(']') + 1,
-        ) ||
+        validateMessage.message ||
         message ||
         'Something went wrong',
     });
