@@ -242,14 +242,14 @@ export class ProductService implements IProductSerivce {
       const { specCates, specValues, specs } = defaultForm;
 
       const updatedProduct = wrap(product).assign({
-        specs,
-        specCates,
-        specValues,
+        specs: specs.toArray().map((spec) => spec.id),
+        specCates: specCates.toArray().map((cate) => cate.id),
+        specValues: specValues.toArray().map((value) => value.id),
       });
 
       await this.commit(updatedProduct);
 
-      return updatedProduct;
+      return await this.getOne(idProduct);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(ProductService.name, err);

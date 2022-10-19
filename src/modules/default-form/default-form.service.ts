@@ -88,9 +88,12 @@ export class DefaultFormService implements IDefaultFormService {
 
   async getOneRaw(id: string): Promise<IDefaultForm> {
     try {
-      const defaultForm = await this.defaultFormRepo.findOne({
-        id: id,
-      });
+      const defaultForm = await this.defaultFormRepo.findOne(
+        {
+          id: id,
+        },
+        { fields: ['specs', 'specCates', 'specValues'] },
+      );
 
       if (!defaultForm) throw new NotFoundRecord(id);
 

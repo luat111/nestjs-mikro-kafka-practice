@@ -4,10 +4,18 @@ import { IsOptional } from 'class-validator';
 import { UpdateProductDTO } from './update-product.dto';
 
 export class GetProductDTO extends OmitType(UpdateProductDTO, [
+  'name',
   'specs',
   'specValues',
   'specCates',
 ]) {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }) => {
+    return { $ilike: `%${value}%` };
+  })
+  name: string;
+
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @Transform(({ value }) => {

@@ -5,11 +5,13 @@ import {
   Inject,
   Param,
   Patch,
+  Post,
   Put,
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
+import { CreateProductDTO } from './dto/create-product.dto';
 import { GetProductDTO } from './dto/get-product.dto';
 import { GetOneProductDTO } from './dto/product.dto';
 import { UpdateProductDTO } from './dto/update-product.dto';
@@ -46,6 +48,15 @@ export class ProductController {
     try {
       const { id } = params;
       return await this.productSerivce.getOne(id);
+    } catch (err) {
+      throw new BadRequest(ProductController.name, err);
+    }
+  }
+
+  @Post()
+  async create(@Body() body: CreateProductDTO) {
+    try {
+      return await this.productSerivce.create(body);
     } catch (err) {
       throw new BadRequest(ProductController.name, err);
     }
