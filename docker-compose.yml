@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  spec-be:
+    container_name: spec-backend
+    build: .
+    restart: always
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+
+      - DB_USERNAME_LOCAL=${DB_USERNAME_LOCAL}
+      - DB_PASSWORD_LOCAL=${DB_PASSWORD_LOCAL}
+      - DB_DATABASE_LOCAL=${DB_DATABASE_LOCAL}
+      - DB_HOST_LOCAL=postgres
+      - DB_PORT_LOCAL=${DB_PORT_LOCAL}
+
+      - PORT=${PORT}
+    ports:
+      - "3003:3003"
+    depends_on:
+      - postgres
+  postgres:
+    container_name: db-postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USERNAME_LOCAL}
+      - POSTGRES_DB=${DB_DATABASE_LOCAL}
+      - POSTGRES_PASSWORD=${DB_PASSWORD_LOCAL}
+    ports:
+      - "${DB_PORT_LOCAL}:5432"
+
+networks:
+  default:
+    driver: bridge
