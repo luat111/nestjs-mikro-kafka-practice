@@ -52,6 +52,7 @@ export class SpecValueService implements ISpecValueService {
       const specValues = await this.specValueRepo.find(
         { ...rest },
         {
+          populate: ['specification'],
           offset: (page - 1) * pageLength,
           limit: pageLength,
         },
@@ -144,7 +145,7 @@ export class SpecValueService implements ISpecValueService {
       });
 
       await this.commit(updatedSpecValue);
-      return updatedSpecValue;
+      return await this.getOne(id);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecValueService.name, err);

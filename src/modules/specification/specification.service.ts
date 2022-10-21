@@ -2,7 +2,7 @@ import {
   EntityRepository,
   MikroORM,
   UseRequestContext,
-  wrap,
+  wrap
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -56,6 +56,7 @@ export class SpecificationService {
           ...rest,
         },
         {
+          populate: ['cate'],
           offset: (page - 1) * pageLength,
           limit: pageLength,
         },
@@ -166,7 +167,7 @@ export class SpecificationService {
       });
 
       await this.commit(updatedSpec);
-      return updatedSpec;
+      return await this.getOne(id);
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecificationService.name, err);
