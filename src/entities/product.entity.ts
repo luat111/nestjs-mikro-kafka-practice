@@ -31,17 +31,17 @@ class ProductEntity {
 
   @ManyToMany(() => SpecValueEntity, (values) => values.products, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specValues: Collection<SpecValueEntity>;
   @ManyToMany(() => SpecificationEntity, (specs) => specs.products, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specs: Collection<SpecificationEntity>;
   @ManyToMany(() => SpecCategoryEntity, (cates) => cates.products, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specCates: Collection<SpecCategoryEntity>;
 }

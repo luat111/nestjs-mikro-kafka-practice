@@ -20,17 +20,17 @@ class DefaultFormEntity {
 
   @ManyToMany(() => SpecValueEntity, (values) => values.defaultForms, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specValues: Collection<SpecValueEntity>;
   @ManyToMany(() => SpecificationEntity, (specs) => specs.defaultForms, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specs: Collection<SpecificationEntity>;
   @ManyToMany(() => SpecCategoryEntity, (cates) => cates.defaultForms, {
     owner: true,
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   specCates: Collection<SpecCategoryEntity>;
 }

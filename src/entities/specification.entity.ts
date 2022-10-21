@@ -46,8 +46,8 @@ class SpecificationEntity {
   updatedAt!: Date;
 
   @ManyToOne(() => SpecCategoryEntity, {
-    cascade: [Cascade.ALL],
-    onDelete: 'cascade',
+    cascade: [Cascade.PERSIST],
+    onDelete: 'set null',
     onUpdateIntegrity: 'set null',
     nullable: false,
   })
@@ -59,12 +59,12 @@ class SpecificationEntity {
   specValues: Collection<SpecValueEntity>;
 
   @ManyToMany(() => ProductEntity, (products) => products.specs, {
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   products: Collection<ProductEntity>;
 
   @ManyToMany(() => DefaultFormEntity, (form) => form.specs, {
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   defaultForms: Collection<DefaultFormEntity>;
 }

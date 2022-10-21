@@ -44,20 +44,19 @@ class SpecValueEntity {
   updatedAt!: Date;
 
   @ManyToOne(() => SpecificationEntity, {
-    cascade: [Cascade.ALL],
-    onUpdateIntegrity: 'set null',
-    onDelete: 'cascade',
+    cascade: [Cascade.PERSIST],
+    onDelete: 'set null',
     nullable: false,
   })
   specification: SpecificationEntity;
 
   @ManyToMany(() => ProductEntity, (products) => products.specValues, {
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   products: Collection<ProductEntity>;
 
   @ManyToMany(() => DefaultFormEntity, (form) => form.specValues, {
-    cascade: [Cascade.ALL],
+    cascade: [Cascade.PERSIST],
   })
   defaultForms: Collection<DefaultFormEntity>;
 }
