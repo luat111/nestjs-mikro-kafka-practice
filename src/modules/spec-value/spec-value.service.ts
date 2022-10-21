@@ -107,11 +107,14 @@ export class SpecValueService implements ISpecValueService {
     try {
       const { specification } = payload;
 
-      await this.specService.getOne(specification);
+      const spec = await this.specService.getOne(specification);
 
       const specValue = this.specValueRepo.create(payload);
       await this.commit(specValue);
-      return specValue;
+      return wrap(specValue).assign(
+        { specification: spec },
+        { em: this.orm.em },
+      );
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecValueService.name, err);

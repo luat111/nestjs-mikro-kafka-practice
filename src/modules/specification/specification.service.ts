@@ -2,7 +2,7 @@ import {
   EntityRepository,
   MikroORM,
   UseRequestContext,
-  wrap
+  wrap,
 } from '@mikro-orm/core';
 import { InjectMikroORM, InjectRepository } from '@mikro-orm/nestjs';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
@@ -119,10 +119,10 @@ export class SpecificationService {
   async create(payload: CreateSpecDTO): Promise<ISpecification> {
     try {
       const { cate } = payload;
-      await this.specCateService.getOne(cate);
+      const specCate = await this.specCateService.getOne(cate);
       const spec = this.specRepo.create(payload);
       await this.commit(spec);
-      return spec;
+      return wrap(spec).assign({ cate: specCate }, { em: this.orm.em });
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecificationService.name, err);
