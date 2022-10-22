@@ -20,6 +20,6 @@ COPY --from=build /app/spec-backend /
 
 EXPOSE 3003
 
-CMD npm run migration:create && \
-    npm run migration:up && \
+#npm run migration:create && \
+CMD npm run migration:up && \
     npm start
