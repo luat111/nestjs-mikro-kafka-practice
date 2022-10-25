@@ -9,6 +9,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
+import { List } from 'src/core/interfaces';
 import SpecificationEntity from 'src/entities/specification.entity';
 import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 
@@ -48,10 +49,10 @@ export class SpecificationService {
     await this.specRepo.persistAndFlush(payload);
   }
 
-  async getAll(query: GetSpecDTO): Promise<ISpecification[]> {
+  async getAll(query: GetSpecDTO): Promise<List<ISpecification>> {
     try {
       const { page, pageLength, ...rest } = query;
-      const specs = await this.specRepo.find(
+      const [specs, count] = await this.specRepo.findAndCount(
         {
           ...rest,
         },
@@ -61,7 +62,11 @@ export class SpecificationService {
           limit: pageLength,
         },
       );
-      return specs;
+      return {
+        rows: specs,
+        count,
+        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+      };
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecificationService.name, err);

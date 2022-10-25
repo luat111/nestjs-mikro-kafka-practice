@@ -15,6 +15,7 @@ import { LoggerService } from '../logger/logger.service';
 import { IProductSerivce } from '../product/interface/product.interface';
 import { ISpecificationService } from '../specification/interface/specification.interface';
 
+import { List } from 'src/core/interfaces';
 import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
@@ -48,17 +49,21 @@ export class SpecCateService implements ISpecCategorySerivce {
     await this.specCateRepo.persistAndFlush(payload);
   }
 
-  async getAll(query: GetSpecCategoryDTO): Promise<ISpecCateogry[]> {
+  async getAll(query: GetSpecCategoryDTO): Promise<List<ISpecCateogry>> {
     try {
       const { page, pageLength, ...rest } = query;
-      const cates = await this.specCateRepo.find(
+      const [cates, count] = await this.specCateRepo.findAndCount(
         { ...rest },
         {
           offset: (page - 1) * pageLength,
           limit: pageLength,
         },
       );
-      return cates;
+      return {
+        rows: cates,
+        count,
+        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+      };
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecCateService.name, err);

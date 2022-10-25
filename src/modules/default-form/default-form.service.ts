@@ -5,6 +5,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
+import { List } from 'src/core/interfaces';
 import DefaultFormEntity from 'src/entities/default-form.entity';
 
 import { LoggerService } from '../logger/logger.service';
@@ -16,7 +17,7 @@ import { GetDefaultFormDTO } from './dto/get-default-form.dto';
 import { UpdateDefaultFormDTO } from './dto/update-default-form.dto';
 import {
   IDefaultForm,
-  IDefaultFormService,
+  IDefaultFormService
 } from './interface/default-form.interface';
 
 @Injectable()
@@ -106,17 +107,21 @@ export class DefaultFormService implements IDefaultFormService {
     }
   }
 
-  async getAll(query: GetDefaultFormDTO): Promise<IDefaultForm[]> {
+  async getAll(query: GetDefaultFormDTO): Promise<List<IDefaultForm>> {
     try {
       const { page, pageLength, ...rest } = query;
-      const defaultForms = await this.defaultFormRepo.find(
+      const [defaultForms, count] = await this.defaultFormRepo.findAndCount(
         { ...rest },
         {
           offset: (page - 1) * pageLength,
           limit: pageLength,
         },
       );
-      return defaultForms;
+      return {
+        rows: defaultForms,
+        count,
+        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+      };
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(DefaultFormService.name, err);
@@ -230,8 +235,8 @@ export class DefaultFormService implements IDefaultFormService {
 
   async remove(id: string): Promise<string> {
     try {
-      const spec = await this.getOne(id);
-      await this.defaultFormRepo.removeAndFlush(spec);
+      const form = await this.getOne(id);
+      await this.defaultFormRepo.removeAndFlush(form);
       return 'Delete successed';
     } catch (err) {
       this.logger.error(err);

@@ -1,10 +1,11 @@
+import { List } from 'src/core/interfaces';
 import SpecCategoryEntity from 'src/entities/spec-category.entity';
 import { CreateSpecCategoryDTO } from '../dto/create-spec-category.dto';
 import { GetSpecCategoryDTO } from '../dto/get-spec-category.dto';
 import { UpdateSpecCategoryDTO } from '../dto/update-spec-category.dto';
 
 export interface ISpecCategorySerivce {
-  getAll(query: GetSpecCategoryDTO): Promise<ISpecCateogry[]>;
+  getAll(query: GetSpecCategoryDTO): Promise<List<ISpecCateogry>>;
   getFilter(): Promise<ISpecCateogry[]>;
   getOne(id: string): Promise<ISpecCateogry>;
   create(payload: CreateSpecCategoryDTO): Promise<ISpecCateogry>;

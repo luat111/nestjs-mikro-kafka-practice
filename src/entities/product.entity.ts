@@ -17,7 +17,7 @@ import SpecificationEntity from './specification.entity';
   cond: () => ({
     publish: true,
   }),
-  default: true,
+  default: false,
 })
 class ProductEntity {
   @PrimaryKey()

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
+import { List } from 'src/core/interfaces';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 import { GetOneSpecCategoryDTO } from './dto/spec-category.dto';
@@ -29,7 +30,7 @@ export class SpecCateController {
   ) {}
 
   @Get()
-  async getAll(@Query() query: GetSpecCategoryDTO): Promise<ISpecCateogry[]> {
+  async getAll(@Query() query: GetSpecCategoryDTO): Promise<List<ISpecCateogry>> {
     try {
       const cates = await this.specCateSerivce.getAll(query);
       return cates;

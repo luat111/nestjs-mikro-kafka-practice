@@ -9,6 +9,7 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
+import { List } from 'src/core/interfaces';
 import SpecValueEntity from 'src/entities/spec-value.entity';
 import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 
@@ -46,10 +47,10 @@ export class SpecValueService implements ISpecValueService {
     await this.specValueRepo.persistAndFlush(payload);
   }
 
-  async getAll(query: GetSpecValueDTO): Promise<ISpecValue[]> {
+  async getAll(query: GetSpecValueDTO): Promise<List<ISpecValue>> {
     try {
       const { page, pageLength, ...rest } = query;
-      const specValues = await this.specValueRepo.find(
+      const [specValues, count] = await this.specValueRepo.findAndCount(
         { ...rest },
         {
           populate: ['specification'],
@@ -57,7 +58,11 @@ export class SpecValueService implements ISpecValueService {
           limit: pageLength,
         },
       );
-      return specValues;
+      return {
+        rows: specValues,
+        count,
+        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+      };
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(SpecValueService.name, err);

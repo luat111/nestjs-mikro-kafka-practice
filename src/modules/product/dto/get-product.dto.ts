@@ -5,6 +5,7 @@ import { UpdateProductDTO } from './update-product.dto';
 
 export class GetProductDTO extends OmitType(UpdateProductDTO, [
   'name',
+  'publish',
   'specs',
   'specValues',
   'specCates',
@@ -15,6 +16,15 @@ export class GetProductDTO extends OmitType(UpdateProductDTO, [
     return { $ilike: `%${value}%` };
   })
   name: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
+  publish: boolean;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

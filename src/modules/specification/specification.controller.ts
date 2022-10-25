@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
+import { List } from 'src/core/interfaces';
 import ISpecification from 'src/entities/specification.entity';
 import { CreateSpecDTO } from './dto/create-spec.dto';
 import { GetSpecDTO } from './dto/get-spec.dto';
@@ -27,7 +28,7 @@ export class SpecificationController {
   ) {}
 
   @Get()
-  async getAll(@Query() query: GetSpecDTO): Promise<ISpecification[]> {
+  async getAll(@Query() query: GetSpecDTO): Promise<List<ISpecification>> {
     try {
       const specs = await this.specSerivce.getAll(query);
       return specs;

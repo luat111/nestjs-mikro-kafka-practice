@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { EachMessagePayload } from 'kafkajs';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
 import NotFoundRecord from 'src/core/exceptions/not-found.exception';
+import { List } from 'src/core/interfaces';
 import ProductEntity from 'src/entities/product.entity';
 import { IDefaultFormService } from '../default-form/interface/default-form.interface';
 
@@ -114,14 +115,18 @@ export class ProductService implements IProductSerivce {
     }
   }
 
-  async getAll(query: GetProductDTO): Promise<IProduct[]> {
+  async getAll(query: GetProductDTO): Promise<List<IProduct>> {
     try {
       const { page, pageLength, ...rest } = query;
-      const [products] = await this.productRepoLocal.findAndCount(
+      const [products, count] = await this.productRepoLocal.findAndCount(
         { ...rest },
         { offset: pageLength * (page - 1), limit: pageLength },
       );
-      return products;
+      return {
+        rows: products,
+        count,
+        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+      };
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(ProductService.name, err);

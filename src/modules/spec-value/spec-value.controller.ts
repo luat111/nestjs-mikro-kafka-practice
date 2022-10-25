@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import BadRequest from 'src/core/exceptions/bad-request.exception';
+import { List } from 'src/core/interfaces';
 import { CreateSpecValueDTO } from './dto/create-spec-value.dto';
 import { GetSpecValueDTO } from './dto/get-spec-value.dto';
 import { GetFilterSpecValue, GetOneSpecValueDTO } from './dto/spec-value.dto';
@@ -29,10 +30,10 @@ export class SpecValueController {
   ) {}
 
   @Get()
-  async getAll(@Query() query: GetSpecValueDTO): Promise<ISpecValue[]> {
+  async getAll(@Query() query: GetSpecValueDTO): Promise<List<ISpecValue>> {
     try {
-      const cates = await this.specValueSerivce.getAll(query);
-      return cates;
+      const values = await this.specValueSerivce.getAll(query);
+      return values;
     } catch (err) {
       throw new BadRequest(SpecValueController.name, err);
     }
@@ -42,8 +43,8 @@ export class SpecValueController {
   async getFilter(@Param() params: GetFilterSpecValue): Promise<ISpecValue[]> {
     try {
       const { specId } = params;
-      const cates = await this.specValueSerivce.getFilter(specId);
-      return cates;
+      const values = await this.specValueSerivce.getFilter(specId);
+      return values;
     } catch (err) {
       throw new BadRequest(SpecValueController.name, err);
     }
