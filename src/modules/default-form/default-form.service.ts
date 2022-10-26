@@ -17,7 +17,7 @@ import { GetDefaultFormDTO } from './dto/get-default-form.dto';
 import { UpdateDefaultFormDTO } from './dto/update-default-form.dto';
 import {
   IDefaultForm,
-  IDefaultFormService
+  IDefaultFormService,
 } from './interface/default-form.interface';
 
 @Injectable()
@@ -172,6 +172,11 @@ export class DefaultFormService implements IDefaultFormService {
 
         for (const spec of defaultForm.specs) {
           if (!specCates.includes(spec.cate.id)) {
+            for (const specValue of defaultForm.specValues) {
+              if (specValue.specification.id === spec.id) {
+                defaultForm.specValues.remove(specValue);
+              }
+            }
             defaultForm.specs.remove(spec);
           }
         }

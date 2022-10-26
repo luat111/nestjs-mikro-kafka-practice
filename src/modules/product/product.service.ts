@@ -177,6 +177,11 @@ export class ProductService implements IProductSerivce {
 
         for (const spec of product.specs) {
           if (!specCates.includes(spec.cate.id)) {
+            for (const specValue of product.specValues) {
+              if (specValue.specification.id === spec.id) {
+                product.specValues.remove(specValue);
+              }
+            }
             product.specs.remove(spec);
           }
         }
