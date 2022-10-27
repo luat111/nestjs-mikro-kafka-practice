@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsOptional } from 'class-validator';
+import { ToArrayQuery, ToILikeQuery } from 'src/core/decorators';
 import { UpdateDefaultFormDTO } from './update-default-form.dto';
 
 export class GetDefaultFormDTO extends OmitType(UpdateDefaultFormDTO, [
@@ -11,36 +12,22 @@ export class GetDefaultFormDTO extends OmitType(UpdateDefaultFormDTO, [
 ]) {
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(({ value }) => {
-    return { $ilike: `%${value}%` };
-  })
+  @ToILikeQuery()
   name: string;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specs?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specValues?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specCates?: string[];
 
   @ApiProperty({ required: true, default: 1 })

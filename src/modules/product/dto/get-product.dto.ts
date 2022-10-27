@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsOptional } from 'class-validator';
+import { ToArrayQuery, ToBoolean, ToILikeQuery } from 'src/core/decorators';
 import { UpdateProductDTO } from './update-product.dto';
 
 export class GetProductDTO extends OmitType(UpdateProductDTO, [
@@ -12,45 +13,27 @@ export class GetProductDTO extends OmitType(UpdateProductDTO, [
 ]) {
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(({ value }) => {
-    return { $ilike: `%${value}%` };
-  })
+  @ToILikeQuery()
   name: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return value;
-  })
+  @ToBoolean()
   publish: boolean;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specs?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specValues?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (Array.isArray(value)) return value;
-    if (value.includes(',')) return value.split(',');
-    return [value];
-  })
+  @ToArrayQuery()
   specCates?: string[];
 
   @ApiProperty({ required: true, default: 1 })
