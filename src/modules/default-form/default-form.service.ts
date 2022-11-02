@@ -120,7 +120,10 @@ export class DefaultFormService implements IDefaultFormService {
       return {
         rows: defaultForms,
         count,
-        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+        totalPage:
+          count % pageLength !== 0
+            ? Math.floor(count / pageLength) + 1
+            : Math.floor(count / pageLength),
       };
     } catch (err) {
       this.logger.error(err);
@@ -224,9 +227,12 @@ export class DefaultFormService implements IDefaultFormService {
 
       const updatedDefaultForm = wrap(defaultForm).assign({
         ...rest,
-        specs: specs || defaultForm.specs,
-        specCates: specCates || defaultForm.specCates,
-        specValues: specValues || defaultForm.specValues,
+        specs: specs || defaultForm.specs.toArray().map((spec) => spec.id),
+        specCates:
+          specCates || defaultForm.specCates.toArray().map((cate) => cate.id),
+        specValues:
+          specValues ||
+          defaultForm.specValues.toArray().map((value) => value.id),
       });
 
       await this.commit(updatedDefaultForm);

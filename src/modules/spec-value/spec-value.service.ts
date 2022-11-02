@@ -61,7 +61,10 @@ export class SpecValueService implements ISpecValueService {
       return {
         rows: specValues,
         count,
-        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+        totalPage:
+          count % pageLength !== 0
+            ? Math.floor(count / pageLength) + 1
+            : Math.floor(count / pageLength),
       };
     } catch (err) {
       this.logger.error(err);
@@ -147,9 +150,12 @@ export class SpecValueService implements ISpecValueService {
 
       const updatedSpecValue = wrap(specValue).assign({
         ...rest,
-        specification: specification || specValue.specification,
-        products: products || specValue.products,
-        defaultForms: defaultForms || specValue.defaultForms,
+        specification: specification || specValue.specification.id,
+        products:
+          products || specValue.products.toArray().map((prod) => prod.id),
+        defaultForms:
+          defaultForms ||
+          specValue.defaultForms.toArray().map((form) => form.id),
       });
 
       await this.commit(updatedSpecValue);

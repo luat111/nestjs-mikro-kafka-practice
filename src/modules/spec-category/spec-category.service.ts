@@ -62,7 +62,10 @@ export class SpecCateService implements ISpecCategorySerivce {
       return {
         rows: cates,
         count,
-        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+        totalPage:
+          count % pageLength !== 0
+            ? Math.floor(count / pageLength) + 1
+            : Math.floor(count / pageLength),
       };
     } catch (err) {
       this.logger.error(err);
@@ -155,9 +158,10 @@ export class SpecCateService implements ISpecCategorySerivce {
 
       const updatedCate = wrap(cate).assign({
         ...rest,
-        specs: specs || cate.specs,
-        products: products || cate.products,
-        defaultForms: defaultForms || cate.defaultForms,
+        specs: specs || cate.specs.toArray().map((spec) => spec.id),
+        products: products || cate.products.toArray().map((prod) => prod.id),
+        defaultForms:
+          defaultForms || cate.defaultForms.toArray().map((form) => form.id),
       });
 
       await this.commit(cate);

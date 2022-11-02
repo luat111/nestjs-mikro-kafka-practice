@@ -125,7 +125,10 @@ export class ProductService implements IProductSerivce {
       return {
         rows: products,
         count,
-        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+        totalPage:
+          count % pageLength !== 0
+            ? Math.floor(count / pageLength) + 1
+            : Math.floor(count / pageLength),
       };
     } catch (err) {
       this.logger.error(err);
@@ -229,9 +232,11 @@ export class ProductService implements IProductSerivce {
 
       const updatedProduct = wrap(product).assign({
         ...rest,
-        specs: specs || product.specs,
-        specCates: specCates || product.specCates,
-        specValues: specValues || product.specValues,
+        specs: specs || product.specs.toArray().map((spec) => spec.id),
+        specCates:
+          specCates || product.specCates.toArray().map((cate) => cate.id),
+        specValues:
+          specValues || product.specValues.toArray().map((value) => value.id),
       });
 
       await this.commit(updatedProduct);

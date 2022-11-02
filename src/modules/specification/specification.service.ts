@@ -65,7 +65,10 @@ export class SpecificationService {
       return {
         rows: specs,
         count,
-        totalPage: count < pageLength ? 1 : Math.floor(count / pageLength),
+        totalPage:
+          count % pageLength !== 0
+            ? Math.floor(count / pageLength) + 1
+            : Math.floor(count / pageLength),
       };
     } catch (err) {
       this.logger.error(err);
@@ -165,10 +168,12 @@ export class SpecificationService {
 
       const updatedSpec = wrap(spec).assign({
         ...rest,
-        cate: cate || spec.cate,
-        specValues: specValues || spec.specValues,
-        products: products || spec.products,
-        defaultForms: defaultForms || spec.defaultForms,
+        cate: cate || spec.cate.id,
+        specValues:
+          specValues || spec.specValues.toArray().map((value) => value.id),
+        products: products || spec.products.toArray().map((prod) => prod.id),
+        defaultForms:
+          defaultForms || spec.defaultForms.toArray().map((form) => form.id),
       });
 
       await this.commit(updatedSpec);
