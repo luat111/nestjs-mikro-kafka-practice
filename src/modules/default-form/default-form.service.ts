@@ -73,6 +73,17 @@ export class DefaultFormService implements IDefaultFormService {
               defaultForms: id,
             },
           },
+          orderBy: {
+            specCates: {
+              indexPos: 'asc',
+              specs: {
+                indexPos: 'asc',
+                specValues: {
+                  indexPos: 'asc',
+                },
+              },
+            },
+          },
         },
       );
 

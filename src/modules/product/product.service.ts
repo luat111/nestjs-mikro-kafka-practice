@@ -101,6 +101,17 @@ export class ProductService implements IProductSerivce {
               products: id,
             },
           },
+          orderBy: {
+            specCates: {
+              indexPos: 'asc',
+              specs: {
+                indexPos: 'asc',
+                specValues: {
+                  indexPos: 'asc',
+                },
+              },
+            },
+          },
         },
       );
 

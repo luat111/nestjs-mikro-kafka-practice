@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import configurations from './config/configurations';
+import { AuthModule } from './modules/auth/auth.module';
 
 import { DatabaseModule } from './modules/database/database.module';
 import { DefaultFormModule } from './modules/default-form/default-form.module.';
@@ -24,6 +25,7 @@ import { SpecificationModule } from './modules/specification/specification.modul
     SpecCateModule,
     SpecValueModule,
     DefaultFormModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
