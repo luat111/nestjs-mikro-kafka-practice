@@ -6,7 +6,7 @@ import {
 } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
-import { ToArrayQuery, ToBoolean, ToILikeQuery } from 'src/core/decorators';
+import { ToArrayQuery, ToBoolean, ToILikeQuery } from 'src/core/decorators/transform-dto';
 import { SpecValueDTO } from './spec-value.dto';
 
 export class GetSpecValueDTO extends PartialType(

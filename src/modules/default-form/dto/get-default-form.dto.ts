@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsOptional } from 'class-validator';
-import { ToArrayQuery, ToILikeQuery } from 'src/core/decorators';
+import { ToArrayQuery, ToILikeQuery } from 'src/core/decorators/transform-dto';
 import { UpdateDefaultFormDTO } from './update-default-form.dto';
 
 export class GetDefaultFormDTO extends OmitType(UpdateDefaultFormDTO, [

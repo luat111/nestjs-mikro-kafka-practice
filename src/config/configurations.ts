@@ -19,5 +19,9 @@ export default () => ({
     groupId: process.env.GROUP_ID || 'spec-kafka',
     topic: process.env.TOPIC || 'spec-topic',
   },
+  jwt: {
+    secret: process.env.SECRET || '',
+    expire: process.env.EXPIRE || 2592000,
+  },
   port: process.env.PORT || 3000,
 });

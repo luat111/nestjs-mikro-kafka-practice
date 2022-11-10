@@ -26,6 +26,7 @@ async function bootstrap() {
     .setDescription('Product specs API description')
     .setVersion('1.0')
     .addTag('Specs')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' })
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger);
