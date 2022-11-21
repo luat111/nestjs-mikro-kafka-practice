@@ -3,7 +3,7 @@ version: "3.9"
 services:
   spec-be:
     container_name: spec-backend
-    build: .
+    image: spec-be
     restart: always
     environment:
       - DB_USERNAME=${DB_USERNAME}
@@ -18,13 +18,16 @@ services:
       - DB_HOST_LOCAL=postgres
       - DB_PORT_LOCAL=${DB_PORT_LOCAL}
 
+      - SECRET=${SECRET}
+      - EXPIRE=${EXPIRE}
+
       - PORT=${PORT}
     ports:
       - "3003:3003"
     depends_on:
       - postgres
   postgres:
-    container_name: db-postgres
+    container_name: spec-db
     image: postgres:latest
     restart: always
     environment:
