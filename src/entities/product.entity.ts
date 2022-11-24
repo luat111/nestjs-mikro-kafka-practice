@@ -26,6 +26,9 @@ class ProductEntity {
   @Property({ nullable: false })
   name: string;
 
+  @Property({ nullable: true })
+  uri: string;
+
   @Property()
   publish: boolean;
 

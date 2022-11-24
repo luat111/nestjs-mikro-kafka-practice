@@ -6,6 +6,7 @@ import { UpdateProductDTO } from './update-product.dto';
 
 export class GetProductDTO extends OmitType(UpdateProductDTO, [
   'name',
+  'uri',
   'publish',
   'specs',
   'specValues',
@@ -13,8 +14,7 @@ export class GetProductDTO extends OmitType(UpdateProductDTO, [
 ]) {
   @ApiPropertyOptional()
   @IsOptional()
-  @ToILikeQuery()
-  name: string;
+  search: string;
 
   @ApiPropertyOptional()
   @IsOptional()

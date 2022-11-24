@@ -128,11 +128,24 @@ export class ProductService implements IProductSerivce {
 
   async getAll(query: GetProductDTO): Promise<List<IProduct>> {
     try {
-      const { page, pageLength, ...rest } = query;
+      const { page, pageLength, search, ...rest } = query;
+
+      if (search) {
+        Object.assign(rest, {
+          $or: [
+            { uri: { $ilike: `%${search}%` } },
+            { name: { $ilike: `%${search}%` } },
+          ],
+        });
+      }
+
       const [products, count] = await this.productRepoLocal.findAndCount(
-        { ...rest },
+        {
+          ...rest,
+        },
         { offset: pageLength * (page - 1), limit: pageLength },
       );
+
       return {
         rows: products,
         count,
@@ -184,7 +197,7 @@ export class ProductService implements IProductSerivce {
       let { id, specCates, specValues, specs, ...rest } = payload;
       const product = await this.getOne(id);
 
-      if (specCates && specCates.length) {
+      if (specCates) {
         await Promise.all(
           specCates.map((cate) => this.specCateService.getOne(cate)),
         );
@@ -201,7 +214,7 @@ export class ProductService implements IProductSerivce {
         }
       }
 
-      if (specs && specs.length) {
+      if (specs) {
         await Promise.all(
           specs.map(async (spec) => {
             const specRecord = await this.specService.getOne(spec);
@@ -285,7 +298,7 @@ export class ProductService implements IProductSerivce {
   async syncProduct(): Promise<IProduct[]> {
     try {
       const productStg = await this.productRepoStg.findAll({
-        fields: ['id', 'name', 'publish'],
+        fields: ['id', 'name', 'uri', 'publish'],
         filters: { getPublish: false },
       });
 
@@ -296,9 +309,14 @@ export class ProductService implements IProductSerivce {
 
       const newProduct: ProductEntity[] = productStg.reduce((newArr, p) => {
         if (!productLocal.some((e) => e.id === p.id)) {
-          const { id, name, publish } = p;
+          const { id, name, uri, publish } = p;
           newArr.push(
-            this.productRepoLocal.create<ProductEntity>({ id, name, publish }),
+            this.productRepoLocal.create<ProductEntity>({
+              id,
+              name,
+              uri,
+              publish,
+            }),
           );
         }
         return newArr;

@@ -12,6 +12,10 @@ export class ProductDTO {
   @ApiProperty()
   @IsString()
   name: string;
+  
+  @ApiProperty()
+  @IsString()
+  uri: string;
 
   @ApiProperty()
   @IsBoolean()

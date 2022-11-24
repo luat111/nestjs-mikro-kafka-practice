@@ -179,7 +179,7 @@ export class DefaultFormService implements IDefaultFormService {
       let { id, specCates, specValues, specs, ...rest } = payload;
       const defaultForm = await this.getOne(id);
 
-      if (specCates && specCates.length) {
+      if (specCates) {
         await Promise.all(
           specCates.map((cate) => this.specCateService.getOne(cate)),
         );
@@ -196,7 +196,7 @@ export class DefaultFormService implements IDefaultFormService {
         }
       }
 
-      if (specs && specs.length) {
+      if (specs) {
         await Promise.all(
           specs.map(async (spec) => {
             const specRecord = await this.specService.getOne(spec);

@@ -38,8 +38,8 @@ export class GetSpecValueDTO extends PartialType(
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  specification?: string;
+  @ToArrayQuery()
+  specification?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

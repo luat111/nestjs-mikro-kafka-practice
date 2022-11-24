@@ -39,8 +39,8 @@ export class GetSpecDTO extends PartialType(
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  cate?: string;
+  @ToArrayQuery()
+  cate?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
