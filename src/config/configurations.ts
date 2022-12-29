@@ -23,5 +23,15 @@ export default () => ({
     secret: process.env.SECRET || '',
     expire: process.env.EXPIRE || 2592000,
   },
+  es: {
+    es_node: process.env.ELASTICSEARCH_NODE || '',
+    es_user: process.env.ELASTICSEARCH_USERNAME || '',
+    es_pwd: process.env.ELASTICSEARCH_PASSWORD || '',
+  },
+  redis: {
+    pwd: process.env.REDIS_PWD || '',
+    host: process.env.REDIS_HOST || '',
+    port: process.env.REDIS_PORT || '',
+  },
   port: process.env.PORT || 3000,
 });

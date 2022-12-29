@@ -17,6 +17,7 @@ import { ISpecificationService } from '../specification/interface/specification.
 
 import { List } from 'src/core/interfaces';
 import { IDefaultFormService } from '../default-form/interface/default-form.interface';
+import { ICachingService } from '../redis/interface/caching.interface';
 import { CreateSpecCategoryDTO } from './dto/create-spec-category.dto';
 import { GetSpecCategoryDTO } from './dto/get-spec-category.dto';
 import { UpdateSpecCategoryDTO } from './dto/update-spec-category.dto';
@@ -40,6 +41,8 @@ export class SpecCateService implements ISpecCategorySerivce {
     private readonly specService: ISpecificationService,
     @Inject(forwardRef(() => 'IDefaultFormService'))
     private readonly defaultFormService: IDefaultFormService,
+    @Inject('ICachingService')
+    private readonly cachingService: ICachingService,
   ) {
     this.logger.setContext(SpecCateService.name);
   }
@@ -51,14 +54,19 @@ export class SpecCateService implements ISpecCategorySerivce {
 
   async getAll(query: GetSpecCategoryDTO): Promise<List<ISpecCateogry>> {
     try {
-      const { page, pageLength, ...rest } = query;
-      const [cates, count] = await this.specCateRepo.findAndCount(
-        { ...rest },
-        {
-          offset: (page - 1) * pageLength,
-          limit: pageLength,
-        },
+      const { page, pageLength, ...rest } = query;      
+      const [cates, count] = await this.cachingService.getOrSet(
+        JSON.stringify(query),
+        () =>
+          this.specCateRepo.findAndCount(
+            { ...rest },
+            {
+              offset: (page - 1) * pageLength,
+              limit: pageLength,
+            },
+          ),
       );
+
       return {
         rows: cates,
         count,

@@ -4,6 +4,7 @@ import SpecCategoryEntity from 'src/entities/spec-category.entity';
 import { DefaultFormModule } from '../default-form/default-form.module.';
 import { LoggerModule } from '../logger/logger.module';
 import { ProductModule } from '../product/product.module.';
+import { RedisModule } from '../redis/redis.module';
 import { SpecificationModule } from '../specification/specification.module.';
 import { SpecCateController } from './spec-category.controller';
 import { SpecCateService } from './spec-category.service';
@@ -16,6 +17,7 @@ import { SpecCateService } from './spec-category.service';
     forwardRef(() => SpecificationModule),
     forwardRef(() => ProductModule),
     forwardRef(() => DefaultFormModule),
+    RedisModule,
   ],
   controllers: [SpecCateController],
   providers: [

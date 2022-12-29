@@ -4,9 +4,13 @@ import {
   Entity,
   Filter,
   ManyToMany,
+  ManyToOne,
+  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import CategoryEntity from './categories';
+import ProductSubCateEntity from './product-subcate';
 import SpecCategoryEntity from './spec-category.entity';
 import SpecValueEntity from './spec-value.entity';
 import SpecificationEntity from './specification.entity';
@@ -31,6 +35,24 @@ class ProductEntity {
 
   @Property()
   publish: boolean;
+
+  @Property({ fieldName: 'salePrice', nullable: true })
+  salePrice: number;
+
+  @Property({ nullable: true, fieldName: 'productPhoto' })
+  productPhoto: string;
+
+  @ManyToOne({
+    entity: () => CategoryEntity,
+    inversedBy: 'products',
+    joinColumn: 'CategoryId',
+    referenceColumnName: 'id',
+    nullable: true,
+  })
+  CategoryId: CategoryEntity;
+
+  @OneToMany(() => ProductSubCateEntity, (e) => e.ProductId)
+  subCates: Collection<ProductSubCateEntity>;
 
   @ManyToMany(() => SpecValueEntity, (values) => values.products, {
     owner: true,

@@ -2,6 +2,7 @@ import {
   Cascade,
   Collection,
   Entity,
+  Index,
   ManyToMany,
   ManyToOne,
   PrimaryKey,
@@ -16,7 +17,8 @@ class SpecValueEntity {
   @PrimaryKey({ type: 'uuid', defaultRaw: 'uuid_generate_v4()' })
   id!: string;
 
-  @Property({ nullable: false, unique: true })
+  @Index()
+  @Property({ nullable: false})
   name: string;
 
   @Property({ nullable: true })

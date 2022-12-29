@@ -43,45 +43,18 @@ export class DefaultFormService implements IDefaultFormService {
     await this.defaultFormRepo.persistAndFlush(payload);
   }
 
-  async getOne(id: string): Promise<IDefaultForm> {
+  async getOne(id: string): Promise<any> {
     try {
       const defaultForm = await this.defaultFormRepo.findOne(
         {
           id: id,
         },
         {
-          populate: ['specCates.specs.specValues', 'specs', 'specValues'],
-          populateWhere: {
-            specCates: {
-              $or: [
-                { defaultForms: id },
-                {
-                  specs: {
-                    $or: [
-                      { defaultForms: id },
-                      {
-                        specValues: {
-                          defaultForms: id,
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-            specValues: {
-              defaultForms: id,
-            },
-          },
+          populate: ['specCates', 'specs', 'specValues'],
           orderBy: {
             specCates: {
               indexPos: 'asc',
-              specs: {
-                indexPos: 'asc',
-                specValues: {
-                  indexPos: 'asc',
-                },
-              },
+              createdAt: 'asc'              
             },
           },
         },
@@ -89,7 +62,27 @@ export class DefaultFormService implements IDefaultFormService {
 
       if (!defaultForm) throw new NotFoundRecord(id);
 
-      return defaultForm;
+      const raw = wrap(defaultForm, true).toJSON();
+
+      raw.specs = raw.specs.map((spec) => {
+        spec.specValues = raw.specValues
+          .filter((value) => {
+            return String(value.specification) === spec.id;
+          })
+          .sort((a, b) => a.indexPos - b.indexPos);
+
+        return spec;
+      });
+
+      raw.specCates = raw.specCates.map((cate) => {
+        cate.specs = raw.specs
+          .filter((spec) => String(spec.cate) === cate.id)
+          .sort((a, b) => a.indexPos - b.indexPos);
+
+        return cate;
+      });
+
+      return raw;
     } catch (err) {
       this.logger.error(err);
       throw new BadRequest(DefaultFormService.name, err);
@@ -177,13 +170,9 @@ export class DefaultFormService implements IDefaultFormService {
   async update(payload: UpdateDefaultFormDTO): Promise<DefaultFormEntity> {
     try {
       let { id, specCates, specValues, specs, ...rest } = payload;
-      const defaultForm = await this.getOne(id);
+      const defaultForm = await this.getOneRaw(id);
 
       if (specCates) {
-        await Promise.all(
-          specCates.map((cate) => this.specCateService.getOne(cate)),
-        );
-
         for (const spec of defaultForm.specs) {
           if (!specCates.includes(spec.cate.id)) {
             for (const specValue of defaultForm.specValues) {
@@ -197,44 +186,12 @@ export class DefaultFormService implements IDefaultFormService {
       }
 
       if (specs) {
-        await Promise.all(
-          specs.map(async (spec) => {
-            const specRecord = await this.specService.getOne(spec);
-            if (
-              defaultForm.specCates
-                .toArray()
-                .every((cate) => cate.id !== specRecord.cate.id) &&
-              !(specCates && !specCates.includes(spec))
-            )
-              specs = specs.filter((e) => e !== spec);
-
-            return specRecord;
-          }),
-        );
-
         for (const specValue of defaultForm.specValues) {
           if (!specs.includes(specValue.specification.id)) {
             defaultForm.specValues.remove(specValue);
           }
         }
       }
-
-      specValues &&
-        specValues.length &&
-        (await Promise.all(
-          specValues.map(async (value) => {
-            const specValue = await this.specValueService.getOne(value);
-            if (
-              !defaultForm.specs
-                .toArray()
-                .some((spec) => spec.id === specValue.specification.id) &&
-              !(specs && specs.includes(value))
-            )
-              specValues = specValues.filter((e) => e !== value);
-
-            return specValue;
-          }),
-        ));
 
       const updatedDefaultForm = wrap(defaultForm).assign({
         ...rest,
