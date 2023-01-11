@@ -1,4 +1,4 @@
-## Tech
+## Techs
 
 - NestJS
 - Kafka
